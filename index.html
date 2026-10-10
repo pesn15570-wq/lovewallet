@@ -4,30 +4,224 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🧸 กระเป๋าหนู</title>
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body { font-family: sans-serif; background: linear-gradient(180deg, #FFF0F5 0%, #FFE4EC 100%); min-height: 100vh; padding: 20px; color: #FF1493; }
-  .container { max-width: 400px; margin: 0 auto; }
-  .header { text-align: center; font-size: 26px; font-weight: bold; margin: 20px 0; text-shadow: 2px 2px 0 #fff; }
-  .card { background: white; border-radius: 25px; padding: 25px; box-shadow: 0 8px 20px rgba(255,105,180,0.2); margin-bottom: 20px; text-align: center; }
-  .remain { font-size: 52px; font-weight: bold; color: #FF1493; }
-  .label { font-size: 14px; color: #FF69B4; }
-  .progress-bar { background: #FFE4EC; border-radius: 20px; height: 20px; margin: 15px 0; overflow: hidden; }
-  .progress-fill { height: 100%; background: linear-gradient(90deg, #FFB6C1, #FF69B4); border-radius: 20px; transition: width 0.5s; }
-  button { width: 100%; padding: 16px; border: none; border-radius: 20px; background: linear-gradient(135deg, #FFB6C1, #FF69B4); color: white; font-size: 16px; font-weight: bold; margin-bottom: 10px; cursor: pointer; box-shadow: 0 4px 10px rgba(255,105,180,0.3); font-family: inherit; }
-  button:active { transform: scale(0.97); }
-  .emojis { text-align: center; font-size: 32px; margin: 15px 0; letter-spacing: 8px; }
-  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,182,193,0.85); justify-content: center; align-items: center; z-index: 100; }
+  
+  body {
+    font-family: 'Mali', cursive;
+    background: linear-gradient(135deg, #FFE4EC 0%, #FFC0CB 50%, #FFB6C1 100%);
+    min-height: 100vh; padding: 20px; color: #C71585;
+    overflow-x: hidden; position: relative;
+  }
+  
+  /* หัวใจลอยพื้นหลัง */
+  .bg-hearts {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+    overflow: hidden;
+  }
+  .bg-hearts span {
+    position: absolute;
+    font-size: 20px;
+    animation: floatUp 12s linear infinite;
+    opacity: 0.5;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.6; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+  
+  .container { max-width: 400px; margin: 0 auto; position: relative; z-index: 1; }
+  
+  .header {
+    text-align: center; font-size: 28px; font-weight: 700;
+    margin: 15px 0 25px;
+    background: linear-gradient(135deg, #FF69B4, #FF1493);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: bounceIn 0.8s ease-out;
+  }
+  @keyframes bounceIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
+  /* การ์ดแบบ glass */
+  .card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 30px;
+    padding: 30px 25px;
+    box-shadow: 0 10px 40px rgba(255, 105, 180, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    margin-bottom: 20px;
+    text-align: center;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    animation: slideUp 0.6s ease-out;
+  }
+  @keyframes slideUp {
+    0% { transform: translateY(30px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  
+  .remain {
+    font-size: 64px; font-weight: 700;
+    background: linear-gradient(135deg, #FF69B4, #FF1493);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: all 0.5s;
+    line-height: 1;
+  }
+  .remain.pulse { animation: pulse 0.6s ease-out; }
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+  
+  .label { font-size: 15px; color: #FF69B4; font-weight: 600; }
+  
+  .progress-bar {
+    background: #FFE4EC; border-radius: 20px;
+    height: 22px; margin: 18px 0; overflow: hidden;
+    box-shadow: inset 0 2px 5px rgba(255,105,180,0.2);
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #FFB6C1, #FF69B4, #FF1493);
+    background-size: 200% 100%;
+    border-radius: 20px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: shimmer 2s linear infinite;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  
+  button {
+    width: 100%; padding: 18px; border: none; border-radius: 22px;
+    background: linear-gradient(135deg, #FFB6C1, #FF69B4);
+    color: white; font-size: 17px; font-weight: 700;
+    margin-bottom: 12px; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(255, 105, 180, 0.4);
+    font-family: inherit;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative; overflow: hidden;
+  }
+  button:active { 
+    transform: scale(0.95) translateY(2px);
+    box-shadow: 0 2px 10px rgba(255, 105, 180, 0.4);
+  }
+  button::before {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    width: 0; height: 0; border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  button:active::before { width: 300px; height: 300px; }
+  
+  .emojis {
+    text-align: center; font-size: 38px;
+    margin: 10px 0; letter-spacing: 12px;
+  }
+  .emojis span {
+    display: inline-block;
+    animation: bounce 2s ease-in-out infinite;
+  }
+  .emojis span:nth-child(1) { animation-delay: 0s; }
+  .emojis span:nth-child(2) { animation-delay: 0.3s; }
+  .emojis span:nth-child(3) { animation-delay: 0.6s; }
+  .emojis span:nth-child(4) { animation-delay: 0.9s; }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+  
+  /* Modal */
+  .modal {
+    display: none; position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(255, 182, 193, 0.7);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    justify-content: center; align-items: center; z-index: 100;
+    animation: fadeIn 0.3s;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   .modal.show { display: flex; }
-  .modal-content { background: white; border-radius: 25px; padding: 25px; width: 85%; max-width: 350px; text-align: center; }
-  .modal-content h3 { color: #FF1493; margin-bottom: 12px; }
-  .modal-content input { width: 100%; padding: 14px; border: 2px solid #FFB6C1; border-radius: 15px; font-size: 16px; margin: 8px 0; text-align: center; font-family: inherit; }
-  .history-item { background: #FFF0F5; padding: 12px; border-radius: 15px; margin-bottom: 8px; display: flex; justify-content: space-between; font-size: 14px; }
+  
+  .modal-content {
+    background: white; border-radius: 30px; padding: 30px;
+    width: 88%; max-width: 360px; text-align: center;
+    box-shadow: 0 20px 60px rgba(255, 105, 180, 0.4);
+    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes popIn {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
+  .modal-content h3 { 
+    color: #FF1493; margin-bottom: 18px; font-size: 22px;
+  }
+  .modal-content input {
+    width: 100%; padding: 15px; border: 3px solid #FFE4EC;
+    border-radius: 18px; font-size: 16px; margin: 8px 0;
+    text-align: center; font-family: inherit;
+    transition: all 0.3s;
+    background: #FFF5F8;
+  }
+  .modal-content input:focus {
+    outline: none; border-color: #FF69B4;
+    box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.15);
+    transform: scale(1.02);
+  }
+  
+  .history-item {
+    background: linear-gradient(135deg, #FFF0F5, #FFE4EC);
+    padding: 14px 18px; border-radius: 18px;
+    margin-bottom: 10px; display: flex; justify-content: space-between;
+    font-size: 15px; font-weight: 600;
+    animation: slideIn 0.4s ease-out backwards;
+    border: 2px solid rgba(255,255,255,0.8);
+  }
+  @keyframes slideIn {
+    from { transform: translateX(-30px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  /* Heart popup */
+  .heart-popup {
+    position: fixed; font-size: 40px;
+    pointer-events: none; z-index: 999;
+    animation: heartFly 1.5s ease-out forwards;
+  }
+  @keyframes heartFly {
+    0% { transform: translateY(0) scale(0.5); opacity: 1; }
+    100% { transform: translateY(-300px) scale(1.5); opacity: 0; }
+  }
+  
+  /* Reset button */
+  .reset-btn {
+    background: linear-gradient(135deg, #FFC0CB, #FFB6C1);
+    font-size: 14px; padding: 12px;
+    margin-top: 10px;
+  }
 </style>
 </head>
 <body>
+<div class="bg-hearts" id="bgHearts"></div>
+
 <div class="container">
   <div class="header">🧸 กระเป๋าหนูเอง 🐰</div>
+
   <div class="card">
     <div class="label">เหลือวันนี้</div>
     <div class="remain" id="remain">100</div>
@@ -35,63 +229,162 @@
     <div class="progress-bar"><div class="progress-fill" id="progress" style="width: 0%"></div></div>
     <div class="label">วันนี้ใช้ไป <b id="todayTotal">0</b> บาท</div>
   </div>
-  <div class="emojis">🐻 🐼 🐰 🎀</div>
+
+  <div class="emojis">
+    <span>🐻</span><span>🐼</span><span>🐰</span><span>🎀</span>
+  </div>
+
   <button onclick="openAdd()">🍰 เพิ่มรายจ่าย</button>
   <button onclick="toggleHistory()">📜 ดูย้อนหลัง</button>
+  <button onclick="resetToday()" class="reset-btn">🔄 รีเซ็ตวันนี้</button>
+
   <div id="historyBox" style="display:none; margin-top:15px;"></div>
 </div>
+
 <div class="modal" id="addModal">
   <div class="modal-content">
     <h3>🍰 จ่ายอะไรไปน้า</h3>
     <input type="text" id="itemInput" placeholder="เช่น ขนม, น้ำหวาน">
     <input type="number" id="amountInput" placeholder="จำนวนเงิน (บาท)">
     <button onclick="saveExpense()">💕 บันทึก</button>
-    <button onclick="closeAdd()" style="background:#FFB6C1;">ยกเลิก</button>
+    <button onclick="closeAdd()" style="background: linear-gradient(135deg, #FFD1DC, #FFC0CB);">ยกเลิก</button>
   </div>
 </div>
+
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
 const firebaseConfig = { databaseURL: "https://lovewallet-71a77-default-rtdb.asia-southeast1.firebasedatabase.app" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+
 let expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
 let todayTotal = parseFloat(localStorage.getItem('todayTotal') || '0');
-function updateUI() {
-  document.getElementById('remain').textContent = Math.max(0, 100 - todayTotal);
-  document.getElementById('todayTotal').textContent = todayTotal;
-  document.getElementById('progress').style.width = Math.min(100, (todayTotal / 100) * 100) + '%';
+
+// สร้างหัวใจพื้นหลัง
+const heartEmojis = ['💕','💖','🎀','🌸','💗','✨'];
+function createBgHearts() {
+  const box = document.getElementById('bgHearts');
+  for (let i = 0; i < 15; i++) {
+    const h = document.createElement('span');
+    h.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+    h.style.left = Math.random() * 100 + '%';
+    h.style.animationDelay = Math.random() * 12 + 's';
+    h.style.animationDuration = (10 + Math.random() * 8) + 's';
+    h.style.fontSize = (14 + Math.random() * 16) + 'px';
+    box.appendChild(h);
+  }
 }
+createBgHearts();
+
+function updateUI() {
+  const remainEl = document.getElementById('remain');
+  remainEl.textContent = Math.max(0, 100 - todayTotal);
+  document.getElementById('todayTotal').textContent = todayTotal;
+  document.getElementById('progress').style.width = 
+    Math.min(100, (todayTotal / 100) * 100) + '%';
+  
+  // pulse animation
+  remainEl.classList.remove('pulse');
+  void remainEl.offsetWidth;
+  remainEl.classList.add('pulse');
+}
+
 function openAdd() { document.getElementById('addModal').classList.add('show'); }
 function closeAdd() { document.getElementById('addModal').classList.remove('show'); }
+
+function createHeartPopup(x, y) {
+  for (let i = 0; i < 5; i++) {
+    const heart = document.createElement('div');
+    heart.className = 'heart-popup';
+    heart.textContent = ['💖','💕','🎀','✨','💗'][i];
+    heart.style.left = (x - 20 + (Math.random() - 0.5) * 60) + 'px';
+    heart.style.top = y + 'px';
+    heart.style.animationDelay = (i * 0.1) + 's';
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 1600);
+  }
+}
+
 function saveExpense() {
   const item = document.getElementById('itemInput').value.trim() || 'ไม่ระบุ';
   const amount = parseFloat(document.getElementById('amountInput').value);
-  if (!amount || amount <= 0) { alert('ใส่จำนวนเงินก่อนน้า 🥺'); return; }
+  if (!amount || amount <= 0) { 
+    alert('ใส่จำนวนเงินก่อนน้า 🥺'); 
+    return; 
+  }
+  
   todayTotal += amount;
   const now = new Date();
-  const record = { date: now.toLocaleDateString('th-TH'), time: now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}), item: item, amount: amount, todayTotal: todayTotal, remain: Math.max(0, 100 - todayTotal), timestamp: Date.now() };
+  const record = { 
+    date: now.toLocaleDateString('th-TH'), 
+    time: now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}), 
+    item: item, amount: amount, 
+    todayTotal: todayTotal, 
+    remain: Math.max(0, 100 - todayTotal), 
+    timestamp: Date.now() 
+  };
+  
   expenses.push(record);
   localStorage.setItem('expenses', JSON.stringify(expenses));
   localStorage.setItem('todayTotal', todayTotal);
   updateUI();
-  db.ref('expenses/' + record.timestamp).set(record).then(() => console.log('ok')).catch(e => console.log(e));
-  if (todayTotal > 100) { setTimeout(() => alert('เกินงบแล้วน้า 🥺💔\nใช้ไป ' + todayTotal + ' บาทแล้ว'), 300); }
+  
+  db.ref('expenses/' + record.timestamp).set(record)
+    .then(() => console.log('ok'))
+    .catch(e => console.log(e));
+  
+  // heart popup
+  createHeartPopup(window.innerWidth / 2, window.innerHeight / 2);
+  
+  if (todayTotal > 100) {
+    document.querySelector('.card').style.animation = 'shake 0.5s';
+    setTimeout(() => {
+      alert('เกินงบแล้วน้า 🥺💔\nใช้ไป ' + todayTotal + ' บาทแล้ว');
+      document.querySelector('.card').style.animation = '';
+    }, 500);
+  }
+  
   document.getElementById('itemInput').value = '';
   document.getElementById('amountInput').value = '';
   closeAdd();
 }
+
 function toggleHistory() {
   const box = document.getElementById('historyBox');
   if (box.style.display === 'none') {
     let html = '<div class="card" style="text-align:left;">';
-    if (expenses.length === 0) { html += '<div style="text-align:center;">ยังไม่มีรายการน้า 🐰</div>'; }
-    else { [...expenses].reverse().forEach(e => { html += '<div class="history-item"><span>' + e.item + '</span><span>' + e.amount + ' บาท 🎀</span></div>'; }); }
+    if (expenses.length === 0) {
+      html += '<div style="text-align:center;">ยังไม่มีรายการน้า 🐰</div>';
+    } else {
+      [...expenses].reverse().forEach((e, i) => {
+        html += '<div class="history-item" style="animation-delay:' + (i * 0.05) + 's">' +
+          '<span>' + e.item + '</span>' +
+          '<span>' + e.amount + ' บาท 🎀</span>' +
+          '</div>';
+      });
+    }
     html += '</div>';
     box.innerHTML = html;
     box.style.display = 'block';
   } else box.style.display = 'none';
 }
+
+function resetToday() {
+  if (!confirm('รีเซ็ตยอดวันนี้เลยไหม?')) return;
+  todayTotal = 0;
+  expenses = [];
+  localStorage.setItem('expenses', '[]');
+  localStorage.setItem('todayTotal', 0);
+  updateUI();
+  alert('รีเซ็ตแล้วน้า 🎀✨');
+}
+
+// shake animation
+const style = document.createElement('style');
+style.textContent = '@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-10px)} 75%{transform:translateX(10px)} }';
+document.head.appendChild(style);
+
 updateUI();
 </script>
 </body>
