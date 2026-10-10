@@ -4,134 +4,342 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🧸 กระเป๋าหนู</title>
-<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&family=Itim&family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-  :root { --primary:#FF69B4; --primary-dark:#FF1493; --bg1:#FFE4EC; --bg2:#FFC0CB; --bg3:#FFB6C1; --text:#C71585; }
-  [data-theme="blue"]{--primary:#87CEEB;--primary-dark:#4682B4;--bg1:#E0F4FF;--bg2:#B0E0F5;--bg3:#87CEEB;--text:#1E5A8A;}
-  [data-theme="purple"]{--primary:#DDA0DD;--primary-dark:#9370DB;--bg1:#F5E6FA;--bg2:#E6D0F5;--bg3:#DDA0DD;--text:#6B3FA0;}
-  [data-theme="mint"]{--primary:#98FB98;--primary-dark:#3CB371;--bg1:#E8FFF0;--bg2:#C8F5D8;--bg3:#98FB98;--text:#2E8B57;}
-  [data-theme="peach"]{--primary:#FFB07C;--primary-dark:#FF8C42;--bg1:#FFF0E5;--bg2:#FFD8B8;--bg3:#FFB07C;--text:#C55A11;}
-  [data-theme="dark"]{--primary:#FF69B4;--primary-dark:#FF1493;--bg1:#2A1A2E;--bg2:#3D2A45;--bg3:#4D3055;--text:#FFB6D9;}
-
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-  body{font-family:'Mali',cursive;background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 50%,var(--bg3) 100%);min-height:100vh;padding:20px;color:var(--text);overflow-x:hidden;position:relative;transition:background 0.8s,color 0.8s;}
+  html,body{overscroll-behavior:none;}
+  body{
+    font-family:'Mali',cursive;
+    background:linear-gradient(135deg,#FFE4EC 0%,#FFC0CB 50%,#FFB6C1 100%);
+    min-height:100vh;padding:16px;color:#C71585;
+    overflow-x:hidden;position:relative;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* === BG hearts (ลดจำนวนเพื่อลื่น) === */
   .bg-hearts{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;}
-  .bg-hearts span{position:absolute;font-size:20px;animation:floatUp 12s linear infinite;opacity:0.5;}
-  @keyframes floatUp{0%{transform:translateY(100vh) rotate(0deg);opacity:0}10%{opacity:0.7}90%{opacity:0.7}100%{transform:translateY(-10vh) rotate(360deg);opacity:0}}
+  .bg-hearts span{
+    position:absolute;font-size:18px;
+    will-change:transform;
+    animation:floatUp 14s linear infinite;
+  }
+  @keyframes floatUp{
+    0%{transform:translate3d(0,100vh,0) rotate(0);opacity:0}
+    10%{opacity:0.5}
+    90%{opacity:0.5}
+    100%{transform:translate3d(0,-10vh,0) rotate(360deg);opacity:0}
+  }
+
   .container{max-width:420px;margin:0 auto;position:relative;z-index:1;}
-  .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;}
-  .avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary-dark));display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;box-shadow:0 6px 20px rgba(255,105,180,0.4);border:3px solid white;transition:transform 0.3s;}
-  .avatar:active{transform:scale(0.9) rotate(10deg);}
-  .icon-btn{width:45px;height:45px;border-radius:50%;background:rgba(255,255,255,0.7);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid rgba(255,255,255,0.9);transition:all 0.3s;box-shadow:0 4px 15px rgba(255,105,180,0.2);}
+
+  /* === Top bar === */
+  .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .avatar{
+    width:44px;height:44px;border-radius:50%;
+    background:linear-gradient(135deg,#FFB6C1,#FF69B4);
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;cursor:pointer;
+    box-shadow:0 4px 12px rgba(255,105,180,0.3);
+    border:3px solid white;
+    transition:transform 0.2s;
+  }
+  .avatar:active{transform:scale(0.9);}
+  .icon-btn{
+    width:40px;height:40px;border-radius:50%;
+    background:rgba(255,255,255,0.75);
+    backdrop-filter:blur(8px);
+    display:flex;align-items:center;justify-content:center;
+    font-size:19px;cursor:pointer;
+    border:2px solid rgba(255,255,255,0.9);
+    transition:transform 0.2s;
+  }
   .icon-btn:active{transform:scale(0.9);}
   .icon-btn.muted{opacity:0.5;}
   .top-icons{display:flex;gap:8px;}
-  .header{text-align:center;font-size:28px;font-weight:700;margin:10px 0 5px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:bounceIn 0.8s ease-out;}
-  @keyframes bounceIn{0%{transform:scale(0.5);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
-  .marquee{background:rgba(255,255,255,0.6);border-radius:20px;padding:8px 0;margin:10px 0;overflow:hidden;white-space:nowrap;border:2px solid rgba(255,255,255,0.9);font-size:14px;color:var(--text);font-weight:600;backdrop-filter:blur(10px);}
-  .marquee span{display:inline-block;padding-left:100%;animation:marquee 20s linear infinite;}
-  @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
-  .anniversary{text-align:center;font-size:14px;color:var(--text);margin:8px 0;font-weight:600;background:rgba(255,255,255,0.5);padding:6px;border-radius:15px;}
-  .card{background:rgba(255,255,255,0.85);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);border-radius:30px;padding:25px;box-shadow:0 10px 40px rgba(255,105,180,0.3),inset 0 1px 0 rgba(255,255,255,0.8);margin-bottom:20px;text-align:center;border:2px solid rgba(255,255,255,0.9);animation:slideUp 0.6s ease-out;transition:all 0.3s;position:relative;}
-  .card.shake{animation:shake 0.5s;}
-  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
-  @keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
-  .remain{font-size:68px;font-weight:700;background:linear-gradient(135deg,var(--primary),var(--primary-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;transition:all 0.5s;line-height:1;}
-  .remain.pulse{animation:pulse 0.6s ease-out;}
-  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
-  .label{font-size:15px;color:var(--primary);font-weight:600;}
-  .progress-bar{background:rgba(255,228,236,0.7);border-radius:20px;height:24px;margin:18px 0;overflow:hidden;box-shadow:inset 0 2px 5px rgba(255,105,180,0.2);position:relative;}
-  .progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-dark),var(--primary));background-size:200% 100%;border-radius:20px;transition:width 0.8s cubic-bezier(0.4,0,0.2,1);animation:shimmer 2s linear infinite;position:relative;}
-  .progress-fill::after{content:'';position:absolute;top:0;right:0;width:30px;height:100%;background:radial-gradient(circle,rgba(255,255,255,0.8),transparent);border-radius:50%;}
-  @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-  .quick-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:15px;}
-  .quick-btn{padding:12px 8px;border:none;border-radius:18px;background:rgba(255,255,255,0.7);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;border:2px solid rgba(255,255,255,0.9);box-shadow:0 4px 12px rgba(255,105,180,0.15);transition:all 0.3s;}
-  .quick-btn:active{transform:scale(0.9);background:var(--primary);color:white;}
-  .quick-btn .emoji{font-size:20px;display:block;margin-bottom:3px;}
-  button.main-btn{width:100%;padding:18px;border:none;border-radius:22px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;font-size:17px;font-weight:700;margin-bottom:12px;cursor:pointer;box-shadow:0 6px 20px rgba(255,105,180,0.4);font-family:inherit;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden;}
-  button.main-btn:active{transform:scale(0.95) translateY(2px);}
-  button.main-btn::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,255,255,0.5);transform:translate(-50%,-50%);transition:width 0.6s,height 0.6s;}
-  button.main-btn:active::before{width:400px;height:400px;}
 
-  /* ====== PET SECTION ====== */
-  .pet-card{background:linear-gradient(135deg,rgba(255,255,255,0.95),rgba(255,240,245,0.95));border:3px solid rgba(255,255,255,0.9);}
-  .pet-stage{position:relative;height:180px;display:flex;align-items:center;justify-content:center;margin:10px 0;perspective:500px;}
-  .dog{font-size:90px;cursor:pointer;position:relative;animation:dogIdle 2s ease-in-out infinite;transition:transform 0.3s;user-select:none;filter:drop-shadow(0 8px 15px rgba(255,105,180,0.4));}
-  @keyframes dogIdle{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-15px) rotate(3deg)}}
-  .dog.happy{animation:dogHappy 0.6s ease-out;}
-  @keyframes dogHappy{0%{transform:scale(1) rotate(0)}25%{transform:scale(1.3) rotate(-15deg)}50%{transform:scale(1.2) rotate(15deg)}75%{transform:scale(1.3) rotate(-10deg)}100%{transform:scale(1) rotate(0)}}
-  .dog.eating{animation:dogEat 0.8s ease-out;}
-  @keyframes dogEat{0%,100%{transform:scale(1)}25%{transform:scale(1.1) rotate(-5deg)}50%{transform:scale(1.15)}75%{transform:scale(1.1) rotate(5deg)}}
-  .dog.playing{animation:dogPlay 0.8s ease-out;}
-  @keyframes dogPlay{0%{transform:translateY(0)}50%{transform:translateY(-40px) rotate(360deg)}100%{transform:translateY(0)}}
-  .dog-sleeping{opacity:0.6;}
-  .zzz{position:absolute;font-size:20px;animation:zfloat 2s ease-in-out infinite;pointer-events:none;}
-  @keyframes zfloat{0%,100%{transform:translate(0,0);opacity:0.3}50%{transform:translate(20px,-30px);opacity:1}}
-  .pet-name{font-size:18px;font-weight:700;color:var(--primary-dark);margin-bottom:5px;}
-  .pet-level{font-size:13px;color:var(--primary);background:rgba(255,255,255,0.7);padding:4px 12px;border-radius:12px;display:inline-block;margin-bottom:10px;}
-  .pet-stats{display:flex;gap:10px;margin:15px 0;}
-  .pet-stat{flex:1;background:rgba(255,255,255,0.8);border-radius:18px;padding:10px;border:2px solid rgba(255,255,255,0.9);}
-  .pet-stat-label{font-size:12px;font-weight:600;margin-bottom:5px;color:var(--text);}
-  .pet-stat-bar{background:#FFE4EC;border-radius:10px;height:12px;overflow:hidden;}
-  .pet-stat-fill{height:100%;border-radius:10px;transition:width 0.8s;}
+  .header{
+    text-align:center;font-size:24px;font-weight:700;margin:8px 0;
+    background:linear-gradient(135deg,#FF69B4,#FF1493);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+
+  /* === TIME COUNTER (ใหม่) === */
+  .time-counter{
+    text-align:center;
+    background:linear-gradient(135deg,rgba(255,255,255,0.9),rgba(255,240,245,0.9));
+    border-radius:20px;padding:12px;margin-bottom:12px;
+    border:2px solid rgba(255,255,255,0.9);
+    box-shadow:0 4px 15px rgba(255,105,180,0.2);
+    font-size:13px;font-weight:600;color:#C71585;
+  }
+  .time-counter .time-display{
+    font-size:15px;font-weight:700;color:#FF1493;margin-top:4px;
+    display:flex;justify-content:center;gap:6px;flex-wrap:wrap;
+  }
+  .time-counter .time-display span{
+    background:rgba(255,182,193,0.4);
+    padding:2px 8px;border-radius:10px;
+    min-width:36px;
+  }
+
+  /* === MONEY ZONE (แยกชัดเจน) === */
+  .zone-label{
+    font-size:15px;font-weight:700;color:#FF1493;
+    margin:15px 0 8px;padding-left:4px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .money-zone{
+    background:linear-gradient(135deg,#FFFFFF 0%,#FFF5F8 100%);
+    border-radius:28px;padding:22px;
+    border:3px solid #FF69B4;
+    box-shadow:0 8px 25px rgba(255,105,180,0.35),
+               0 0 0 6px rgba(255,182,193,0.2);
+    text-align:center;margin-bottom:8px;
+    position:relative;overflow:hidden;
+  }
+  .money-zone::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:4px;
+    background:linear-gradient(90deg,#FFB6C1,#FF69B4,#FF1493,#FF69B4,#FFB6C1);
+    background-size:200% 100%;
+    animation:shimmerTop 3s linear infinite;
+  }
+  @keyframes shimmerTop{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  .money-zone .label{font-size:13px;color:#FF69B4;font-weight:600;}
+  .money-zone .remain{
+    font-size:60px;font-weight:700;line-height:1;margin:6px 0;
+    background:linear-gradient(135deg,#FF69B4,#FF1493);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+  .money-zone .remain.pulse{animation:pulse 0.5s ease-out;}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+  .progress-bar{
+    background:rgba(255,228,236,0.8);border-radius:20px;height:18px;
+    margin:12px 0;overflow:hidden;
+    box-shadow:inset 0 2px 5px rgba(255,105,180,0.15);
+  }
+  .progress-fill{
+    height:100%;border-radius:20px;
+    background:linear-gradient(90deg,#FFB6C1,#FF69B4,#FF1493);
+    background-size:200% 100%;
+    transition:width 0.6s ease-out;
+    animation:shimmer 2s linear infinite;
+    will-change:width;
+  }
+  @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  .money-zone .stats{font-size:14px;color:#FF69B4;font-weight:600;margin-top:8px;}
+
+  /* === ZONES === */
+  .zone{
+    background:rgba(255,255,255,0.88);
+    border-radius:26px;padding:20px;
+    margin-bottom:12px;
+    border:2px solid rgba(255,255,255,0.95);
+    box-shadow:0 6px 20px rgba(255,105,180,0.2);
+  }
+
+  /* === PET === */
+  .pet-name{font-size:18px;font-weight:700;color:#FF1493;text-align:center;margin-bottom:4px;}
+  .pet-level{
+    font-size:12px;color:#FF69B4;background:rgba(255,255,255,0.8);
+    padding:4px 12px;border-radius:12px;display:inline-block;margin-bottom:8px;
+  }
+  .pet-stage{
+    height:130px;display:flex;align-items:center;justify-content:center;
+    position:relative;perspective:600px;
+  }
+  .dog{
+    font-size:80px;cursor:pointer;user-select:none;
+    will-change:transform;
+    animation:dogIdle 3s ease-in-out infinite;
+    filter:drop-shadow(0 6px 12px rgba(255,105,180,0.3));
+    transition:filter 0.2s;
+  }
+  @keyframes dogIdle{
+    0%,100%{transform:translate3d(0,0,0) rotate(-3deg)}
+    50%{transform:translate3d(0,-10px,0) rotate(3deg)}
+  }
+  .dog.happy{animation:dogHappy 0.5s ease-out;}
+  @keyframes dogHappy{
+    0%{transform:scale(1) rotate(0)}
+    50%{transform:scale(1.25) rotate(-12deg)}
+    100%{transform:scale(1) rotate(0)}
+  }
+  .dog.eating{animation:dogEat 0.6s ease-out;}
+  @keyframes dogEat{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.15) rotate(8deg)}
+  }
+  .dog.playing{animation:dogPlay 0.7s ease-out;}
+  @keyframes dogPlay{
+    0%{transform:translateY(0)}
+    50%{transform:translateY(-30px) scale(1.1)}
+    100%{transform:translateY(0)}
+  }
+  .pet-stats{display:flex;gap:8px;margin:12px 0;}
+  .pet-stat{
+    flex:1;background:rgba(255,240,245,0.9);
+    border-radius:14px;padding:8px;
+    border:2px solid rgba(255,255,255,0.9);
+  }
+  .pet-stat-label{font-size:11px;font-weight:600;margin-bottom:5px;color:#C71585;}
+  .pet-stat-bar{background:#FFE4EC;border-radius:8px;height:10px;overflow:hidden;}
+  .pet-stat-fill{height:100%;border-radius:8px;transition:width 0.6s ease-out;}
   .fill-hunger{background:linear-gradient(90deg,#FFB6C1,#FF69B4);}
   .fill-happy{background:linear-gradient(90deg,#FFD700,#FFA500);}
+  .exp-bar{background:#FFE4EC;border-radius:8px;height:6px;margin-top:6px;overflow:hidden;}
+  .exp-fill{height:100%;background:linear-gradient(90deg,#FFD700,#FF69B4);border-radius:8px;transition:width 0.4s;}
   .pet-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;}
-  .pet-btn{padding:14px 8px;border:none;border-radius:18px;background:linear-gradient(135deg,#FFF0F5,#FFE4EC);color:var(--primary-dark);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;border:2px solid rgba(255,255,255,0.9);box-shadow:0 4px 12px rgba(255,105,180,0.2);transition:all 0.3s;}
-  .pet-btn:active{transform:scale(0.9);background:var(--primary);color:white;}
-  .pet-btn .ico{font-size:24px;display:block;margin-bottom:4px;}
-  .exp-bar{background:#FFE4EC;border-radius:10px;height:8px;margin-top:5px;overflow:hidden;}
-  .exp-fill{height:100%;background:linear-gradient(90deg,#FFD700,#FF69B4);border-radius:10px;transition:width 0.5s;}
+  .pet-btn{
+    padding:12px 6px;border:none;border-radius:16px;
+    background:linear-gradient(135deg,#FFF0F5,#FFE4EC);
+    color:#FF1493;font-size:12px;font-weight:700;
+    cursor:pointer;font-family:inherit;
+    border:2px solid rgba(255,255,255,0.9);
+    transition:transform 0.15s;
+  }
+  .pet-btn:active{transform:scale(0.92);}
+  .pet-btn .ico{font-size:22px;display:block;margin-bottom:3px;}
 
-  /* ====== MAP ====== */
-  #map{height:250px;border-radius:20px;margin:10px 0;border:3px solid white;box-shadow:0 8px 25px rgba(255,105,180,0.3);}
-  .location-info{font-size:13px;background:rgba(255,255,255,0.7);padding:10px;border-radius:15px;margin-top:10px;text-align:left;}
-  .location-info b{color:var(--primary-dark);}
+  /* === MAP === */
+  #map{height:200px;border-radius:18px;margin:8px 0;border:2px solid white;}
+  .location-info{font-size:12px;background:rgba(255,240,245,0.9);padding:8px 12px;border-radius:12px;margin-top:8px;line-height:1.5;}
+  .location-info b{color:#FF1493;}
 
-  .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,182,193,0.6);backdrop-filter:blur(8px);justify-content:center;align-items:center;z-index:100;animation:fadeIn 0.3s;}
-  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  /* === Main buttons === */
+  button.main-btn{
+    width:100%;padding:15px;border:none;border-radius:20px;
+    background:linear-gradient(135deg,#FFB6C1,#FF69B4);
+    color:white;font-size:16px;font-weight:700;
+    margin-bottom:10px;cursor:pointer;font-family:inherit;
+    box-shadow:0 4px 14px rgba(255,105,180,0.35);
+    transition:transform 0.15s, box-shadow 0.15s;
+    will-change:transform;
+  }
+  button.main-btn:active{
+    transform:scale(0.96);
+    box-shadow:0 2px 8px rgba(255,105,180,0.35);
+  }
+
+  /* === Modal === */
+  .modal{
+    display:none;position:fixed;top:0;left:0;
+    width:100%;height:100%;background:rgba(255,182,193,0.6);
+    backdrop-filter:blur(6px);
+    justify-content:center;align-items:center;z-index:100;
+    padding:20px;
+  }
   .modal.show{display:flex;}
-  .modal-content{background:white;border-radius:30px;padding:30px;width:88%;max-width:380px;text-align:center;box-shadow:0 20px 60px rgba(255,105,180,0.4);animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);max-height:85vh;overflow-y:auto;}
-  @keyframes popIn{0%{transform:scale(0.7);opacity:0}100%{transform:scale(1);opacity:1}}
-  .modal-content h3{color:var(--primary-dark);margin-bottom:18px;font-size:22px;}
-  .modal-content input,.modal-content select{width:100%;padding:15px;border:3px solid #FFE4EC;border-radius:18px;font-size:16px;margin:8px 0;text-align:center;font-family:inherit;transition:all 0.3s;background:#FFF5F8;color:#C71585;}
-  .modal-content input:focus,.modal-content select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px rgba(255,105,180,0.15);transform:scale(1.02);}
+  .modal-content{
+    background:white;border-radius:26px;padding:24px;
+    width:100%;max-width:360px;text-align:center;
+    box-shadow:0 20px 50px rgba(255,105,180,0.4);
+    animation:popIn 0.25s ease-out;
+    max-height:85vh;overflow-y:auto;
+  }
+  @keyframes popIn{0%{transform:scale(0.85);opacity:0}100%{transform:scale(1);opacity:1}}
+  .modal-content h3{color:#FF1493;margin-bottom:14px;font-size:20px;}
+  .modal-content input,.modal-content select{
+    width:100%;padding:13px;border:2px solid #FFE4EC;
+    border-radius:15px;font-size:15px;margin:6px 0;
+    text-align:center;font-family:inherit;
+    background:#FFF5F8;color:#C71585;
+    transition:border-color 0.2s;
+  }
+  .modal-content input:focus,.modal-content select:focus{
+    outline:none;border-color:#FF69B4;
+  }
 
-  .history-item{background:linear-gradient(135deg,#FFF0F5,#FFE4EC);padding:14px 18px;border-radius:18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:600;animation:slideIn 0.4s ease-out backwards;border:2px solid rgba(255,255,255,0.8);position:relative;}
-  @keyframes slideIn{from{transform:translateX(-30px);opacity:0}to{transform:translateX(0);opacity:1}}
+  /* === History === */
+  .history-item{
+    background:linear-gradient(135deg,#FFF0F5,#FFE4EC);
+    padding:12px 14px;border-radius:14px;
+    margin-bottom:8px;display:flex;justify-content:space-between;
+    align-items:center;font-size:14px;font-weight:600;
+    border:1px solid rgba(255,255,255,0.8);
+  }
   .history-item .info{flex:1;text-align:left;}
-  .history-item .time{font-size:11px;color:#FF69B4;}
-  .history-item .actions{display:flex;gap:6px;}
-  .history-item .actions button{width:32px;height:32px;padding:0;border-radius:50%;background:rgba(255,255,255,0.9);color:var(--primary-dark);font-size:16px;box-shadow:none;}
+  .history-item .time{font-size:11px;color:#FF69B4;font-weight:400;}
+  .history-item .actions{display:flex;gap:5px;}
+  .history-item .actions button{
+    width:30px;height:30px;padding:0;border-radius:50%;
+    background:rgba(255,255,255,0.9);color:#FF1493;
+    font-size:14px;box-shadow:none;border:none;
+    cursor:pointer;
+  }
   .history-item .fav-btn.active{background:#FFD700;}
 
-  .heart-popup{position:fixed;font-size:40px;pointer-events:none;z-index:999;animation:heartFly 1.5s ease-out forwards;}
-  @keyframes heartFly{0%{transform:translateY(0) scale(0.5);opacity:1}100%{transform:translateY(-300px) scale(1.5);opacity:0}}
-  .confetti{position:fixed;width:10px;height:10px;pointer-events:none;z-index:998;animation:confettiFall 2s linear forwards;}
-  @keyframes confettiFall{0%{transform:translateY(-10vh) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+  /* === Heart popup (ลดและใช้ GPU) === */
+  .heart-popup{
+    position:fixed;font-size:32px;pointer-events:none;z-index:999;
+    will-change:transform,opacity;
+    animation:heartFly 1.2s ease-out forwards;
+  }
+  @keyframes heartFly{
+    0%{transform:translate3d(0,0,0) scale(0.6);opacity:1}
+    100%{transform:translate3d(0,-200px,0) scale(1.3);opacity:0}
+  }
 
-  .theme-picker{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
-  .theme-dot{width:40px;height:40px;border-radius:50%;cursor:pointer;border:3px solid white;box-shadow:0 4px 10px rgba(0,0,0,0.15);transition:transform 0.3s;}
-  .theme-dot:active{transform:scale(1.2);}
+  /* === Confetti (ลด) === */
+  .confetti{
+    position:fixed;width:8px;height:8px;pointer-events:none;z-index:998;
+    will-change:transform,opacity;
+    animation:confettiFall 1.8s linear forwards;
+  }
+  @keyframes confettiFall{
+    0%{transform:translate3d(0,-10vh,0) rotate(0);opacity:1}
+    100%{transform:translate3d(0,110vh,0) rotate(540deg);opacity:0}
+  }
+
+  /* === Toast === */
+  .toast{
+    position:fixed;top:20px;left:50%;transform:translateX(-50%);
+    background:rgba(255,255,255,0.96);
+    padding:10px 18px;border-radius:18px;
+    box-shadow:0 6px 20px rgba(255,105,180,0.4);
+    color:#FF1493;font-weight:700;z-index:9999;
+    font-family:inherit;font-size:14px;
+    animation:toastIn 0.3s ease-out;
+    max-width:90vw;text-align:center;
+  }
+  @keyframes toastIn{0%{transform:translate(-50%,-20px);opacity:0}100%{transform:translate(-50%,0);opacity:1}}
+
+  /* === Chart === */
+  .chart{display:flex;align-items:flex-end;justify-content:space-around;height:120px;padding:8px;background:rgba(255,240,245,0.5);border-radius:16px;margin:10px 0;}
+  .bar{width:26px;border-radius:8px 8px 0 0;background:linear-gradient(180deg,#FFB6C1,#FF1493);transition:height 0.6s ease-out;position:relative;min-height:4px;}
+  .bar-label{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:#C71585;font-weight:600;}
+
+  /* === Chat === */
+  .chat-msg{
+    background:#FFF0F5;padding:10px 14px;border-radius:14px;
+    margin-bottom:8px;text-align:left;
+    border:1px solid rgba(255,255,255,0.9);
+    font-size:14px;
+  }
+  .chat-msg .chat-meta{font-size:10px;color:#FF69B4;margin-top:4px;}
+
+  /* === Loading === */
+  .loading{text-align:center;padding:40px;font-size:20px;color:#FF69B4;}
+
+  /* === Theme picker === */
+  .theme-picker{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:8px 0;}
+  .theme-dot{width:38px;height:38px;border-radius:50%;cursor:pointer;border:3px solid white;box-shadow:0 3px 8px rgba(0,0,0,0.15);transition:transform 0.2s;}
+  .theme-dot:active{transform:scale(1.15);}
   .theme-dot.pink{background:linear-gradient(135deg,#FFB6C1,#FF69B4);}
   .theme-dot.blue{background:linear-gradient(135deg,#87CEEB,#4682B4);}
   .theme-dot.purple{background:linear-gradient(135deg,#DDA0DD,#9370DB);}
   .theme-dot.mint{background:linear-gradient(135deg,#98FB98,#3CB371);}
   .theme-dot.peach{background:linear-gradient(135deg,#FFB07C,#FF8C42);}
   .theme-dot.dark{background:linear-gradient(135deg,#4D3055,#2A1A2E);}
-  .font-picker{display:flex;gap:8px;justify-content:center;margin:10px 0;flex-wrap:wrap;}
-  .font-btn{padding:10px 18px;border-radius:15px;border:2px solid #FFE4EC;background:white;color:var(--primary-dark);cursor:pointer;font-size:14px;}
-  .font-btn.active{background:var(--primary);color:white;border-color:var(--primary-dark);}
-  .loading{text-align:center;padding:50px;font-size:24px;color:var(--primary);animation:pulse 1.5s infinite;}
-  .chart{display:flex;align-items:flex-end;justify-content:space-around;height:120px;margin:15px 0;padding:10px;background:rgba(255,255,255,0.5);border-radius:20px;}
-  .bar{width:30px;border-radius:10px 10px 0 0;background:linear-gradient(180deg,var(--primary),var(--primary-dark));transition:height 0.8s;position:relative;}
-  .bar-label{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--text);}
+  .font-btn{padding:8px 16px;border-radius:12px;border:2px solid #FFE4EC;background:white;color:#FF1493;cursor:pointer;font-size:13px;font-family:inherit;}
 </style>
 </head>
-<body data-theme="pink">
+<body>
 <div class="bg-hearts" id="bgHearts"></div>
 <div class="container">
+  <!-- Top Bar -->
   <div class="top-bar">
     <div class="avatar" id="avatar" onclick="openSettings()">🧸</div>
     <div class="top-icons">
@@ -140,28 +348,36 @@
     </div>
   </div>
   <div class="header">🧸 กระเป๋าหนูเอง 🐰</div>
-  <div class="marquee"><span id="marqueeText">💕 รักนะ ✨ ประหยัดด้วยน้า 🎀</span></div>
-  <div class="anniversary" id="anniversary">💕 คบกันมาแล้ว ... วัน</div>
+
+  <!-- TIME COUNTER -->
+  <div class="time-counter">
+    💕 คบกันมาแล้ว
+    <div class="time-display">
+      <span id="tDay">0</span> วัน
+      <span id="tHour">0</span> ชม.
+      <span id="tMin">0</span> นาที
+      <span id="tSec">0</span> วิ
+    </div>
+  </div>
 
   <div id="mainContent" style="display:none;">
-    <!-- เงิน -->
-    <div class="card" id="mainCard">
+
+    <!-- ===== MONEY ZONE (บนสุด) ===== -->
+    <div class="zone-label">💰 เงินของฉัน</div>
+    <div class="money-zone" id="mainCard">
       <div class="label">เหลือวันนี้</div>
       <div class="remain" id="remain">100</div>
       <div class="label">บาท</div>
       <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
-      <div class="label">วันนี้ใช้ไป <b id="todayTotal">0</b> บาท</div>
-      <div class="label" style="margin-top:8px;font-size:12px;">เป้าวันนี้ <b id="dailyBudget">100</b> บาท</div>
+      <div class="stats">วันนี้ใช้ไป <b id="todayTotal">0</b> บาท · เป้า <b id="dailyBudget">100</b> บาท</div>
     </div>
 
-    <!-- สัตว์เลี้ยง -->
-    <div class="card pet-card">
+    <!-- ===== PET ZONE ===== -->
+    <div class="zone-label">🐶 สัตว์เลี้ยง</div>
+    <div class="zone" style="text-align:center;">
       <div class="pet-name">🐶 โบโบ้</div>
-      <div class="pet-level" id="petLevel">Lv.1 ✨ EXP 0/100</div>
-      <div class="pet-stage">
-        <div class="dog" id="dog" onclick="petDog()">🐶</div>
-        <div id="zzzBox"></div>
-      </div>
+      <div class="pet-level" id="petLevel">Lv.1 ✨ 0/100</div>
+      <div class="pet-stage"><div class="dog" id="dog" onclick="petDog()">🐶</div></div>
       <div class="pet-stats">
         <div class="pet-stat">
           <div class="pet-stat-label">🍖 ความอิ่ม</div>
@@ -180,32 +396,29 @@
       </div>
     </div>
 
-    <!-- แผนที่ -->
-    <div class="card">
-      <div class="label" style="margin-bottom:10px;">📍 ตำแหน่งของแฟน</div>
+    <!-- ===== MAP ZONE ===== -->
+    <div class="zone-label">📍 ตำแหน่งแฟน</div>
+    <div class="zone">
       <div id="map"></div>
-      <div class="location-info" id="locationInfo">กดปุ่มด้านล่างเพื่ออัปเดตตำแหน่ง</div>
+      <div class="location-info" id="locationInfo">📍 ยังไม่มีตำแหน่ง</div>
       <button class="main-btn" onclick="updateLocation()" style="margin-top:10px;">📍 อัปเดตตำแหน่ง</button>
     </div>
 
-    <!-- Quick buttons -->
-    <div class="quick-grid" id="quickGrid"></div>
-
-    <div class="emojis" id="emojis" style="text-align:center;font-size:42px;margin:12px 0;letter-spacing:10px;">
-      <span onclick="reactEmoji('🐻')" style="display:inline-block;cursor:pointer;animation:bounce 2s ease-in-out infinite;">🐻</span>
-      <span onclick="reactEmoji('🐼')" style="display:inline-block;cursor:pointer;animation:bounce 2s ease-in-out infinite;animation-delay:0.3s;">🐼</span>
-      <span onclick="reactEmoji('🐰')" style="display:inline-block;cursor:pointer;animation:bounce 2s ease-in-out infinite;animation-delay:0.6s;">🐰</span>
-      <span onclick="reactEmoji('🎀')" style="display:inline-block;cursor:pointer;animation:bounce 2s ease-in-out infinite;animation-delay:0.9s;">🎀</span>
+    <!-- ===== QUICK BUTTONS ===== -->
+    <div class="zone-label">⚡ ใช้บ่อย</div>
+    <div class="zone" style="padding:14px;">
+      <div id="quickGrid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;"></div>
     </div>
 
+    <!-- ===== MAIN BUTTONS ===== -->
     <button class="main-btn" onclick="openAdd()">🍰 เพิ่มรายจ่าย</button>
     <button class="main-btn" onclick="toggleHistory()">📜 ดูย้อนหลัง</button>
     <button class="main-btn" onclick="toggleChart()">📊 ดูกราฟ 7 วัน</button>
     <button class="main-btn" onclick="openChat()">💌 กล่องข้อความ</button>
 
-    <div id="historyBox" style="display:none;margin-top:15px;"></div>
-    <div id="chartBox" style="display:none;margin-top:15px;"></div>
-    <div id="chatBox" style="display:none;margin-top:15px;"></div>
+    <div id="historyBox" style="display:none;margin-top:12px;"></div>
+    <div id="chartBox" style="display:none;margin-top:12px;"></div>
+    <div id="chatBox" style="display:none;margin-top:12px;"></div>
   </div>
 
   <div class="loading" id="loadingBox">💕 กำลังโหลดน้า...</div>
@@ -235,7 +448,7 @@
 <div class="modal" id="settingsModal">
   <div class="modal-content">
     <h3>⚙️ ตั้งค่า</h3>
-    <div class="label">🎨 ธีมสี</div>
+    <div class="label" style="color:#FF69B4;font-weight:600;font-size:14px;">🎨 ธีมสี</div>
     <div class="theme-picker">
       <div class="theme-dot pink" onclick="setTheme('pink')"></div>
       <div class="theme-dot blue" onclick="setTheme('blue')"></div>
@@ -244,15 +457,9 @@
       <div class="theme-dot peach" onclick="setTheme('peach')"></div>
       <div class="theme-dot dark" onclick="setTheme('dark')"></div>
     </div>
-    <div class="label" style="margin-top:15px;">✍️ ฟอนต์</div>
-    <div class="font-picker">
-      <div class="font-btn" onclick="setFont('Mali')">Mali</div>
-      <div class="font-btn" onclick="setFont('Itim')">Itim</div>
-      <div class="font-btn" onclick="setFont('Prompt')">Prompt</div>
-    </div>
-    <div class="label" style="margin-top:15px;">💰 งบต่อวัน</div>
+    <div class="label" style="color:#FF69B4;font-weight:600;font-size:14px;margin-top:12px;">💰 งบต่อวัน</div>
     <input type="number" id="budgetInput" placeholder="เช่น 100">
-    <div class="label" style="margin-top:15px;">🖼️ รูปโปรไฟล์ (emoji)</div>
+    <div class="label" style="color:#FF69B4;font-weight:600;font-size:14px;margin-top:12px;">🖼️ รูปโปรไฟล์</div>
     <input type="text" id="avatarInput" placeholder="เช่น 🐰" maxlength="2">
     <button class="main-btn" onclick="saveSettings()">💾 บันทึก</button>
     <button class="main-btn" onclick="closeSettings()" style="background:linear-gradient(135deg,#FFD1DC,#FFC0CB);">ปิด</button>
@@ -267,49 +474,43 @@ const firebaseConfig = { databaseURL: "https://lovewallet-71a77-default-rtdb.asi
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let currentMonth = new Date().toISOString().slice(0, 7);
-let expenses = [];
+// ====== STATE ======
+let allExpenses = [];      // ทั้งหมด (สำหรับกราฟ)
+let monthExpenses = [];    // เฉพาะเดือนนี้
 let todayTotal = 0;
 let dailyBudget = 100;
 let muted = false;
 let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-let pet = { hunger: 100, happy: 100, level: 1, exp: 0, name: 'โบโบ้' };
+let pet = { hunger: 100, happy: 100, level: 1, exp: 0 };
 let map, marker;
 
-// ====== ANNIVERSARY ======
-const anniversaryDate = new Date('2023-08-24');
-function updateAnniversary() {
-  const days = Math.floor((new Date() - anniversaryDate) / 86400000);
-  document.getElementById('anniversary').textContent = '💕 คบกันมาแล้ว ' + days + ' วัน 💕';
+// ====== ANNIVERSARY (24/8/66 เวลา 00:00 ไทย) ======
+const START_TIME = new Date('2023-08-24T00:00:00+07:00').getTime();
+function updateTimer() {
+  const diff = Date.now() - START_TIME;
+  if (diff < 0) return;
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('tDay').textContent = d;
+  document.getElementById('tHour').textContent = String(h).padStart(2,'0');
+  document.getElementById('tMin').textContent = String(m).padStart(2,'0');
+  document.getElementById('tSec').textContent = String(s).padStart(2,'0');
 }
+updateTimer();
+setInterval(updateTimer, 1000);
 
-// ====== QUOTES ======
-const quotes = [
-  "💕 รักนะ ประหยัดด้วยน้า","🎀 วันนี้ใช้ให้น้อยน้า","✨ หัวใจดวงโต 💖","🧸 ตุ๊กตาเป็นห่วงนะ","🌸 เก็บเงินเก่งจัง",
-  "💗 ประหยัดเพื่ออนาคต","🐰 วันนี้ต้องสู้ๆ","💖 รักตัวเองด้วยน้า","🎀 ยิ้มหน่อยน้า","💕 คิดถึงเสมอนะ",
-  "✨ ทำได้อยู่แล้ว","🌸 สวยที่สุดในใจ","🧸 หมีเป็นห่วง","💗 กินข้าวด้วยน้า","🎀 พักผ่อนบ้าง",
-  "💕 เก่งมากเลย","✨ ภูมิใจในตัวเธอ","🌸 รักที่หนึ่ง","🐰 ยิ้มเข้าไว้นะ","💖 วันนี้ดีมาก",
-  "🎀 ขอบคุณนะ","💕 เรามีกันเสมอ","✨ สู้ๆ นะ","🌸 หัวใจนุ่มนิ่ม","🧸 น่ารักที่สุด",
-  "💗 เหนื่อยก็พักนะ","🎀 อย่าลืมกินข้าว","💕 คิดถึงมากๆ","✨ พรุ่งนี้ต้องดีกว่า","🌸 รักนะจุ๊บๆ",
-  "🐰 เป็นกำลังใจให้","💖 ทำได้แน่นอน","🎀 ดื่มน้ำด้วยน้า","💕 มีความสุขทุกวัน","✨ เก่งขึ้นทุกวัน",
-  "🌸 สวยทุกวัน","🧸 อุ่นใจเสมอ","💗 ขอบคุณที่เกิดมา","🎀 รักกันนานๆ","💕 หัวใจเดียวกัน"
-];
-function updateQuote() {
-  const d = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-  document.getElementById('marqueeText').textContent = quotes[d % quotes.length] + '  💕  ' + quotes[d % quotes.length];
-}
-
-// ====== BACKGROUND ======
+// ====== BG hearts (ลดจำนวน) ======
 function createBgHearts() {
   const box = document.getElementById('bgHearts');
-  const arr = ['💕','💖','🎀','🌸','💗','✨','💝','🐻','🐼','🐰','🐶'];
-  for (let i = 0; i < 20; i++) {
+  const arr = ['💕','💖','🎀','🌸','✨','💝','🐻','🐰'];
+  for (let i = 0; i < 8; i++) {
     const h = document.createElement('span');
-    h.textContent = arr[Math.floor(Math.random() * arr.length)];
-    h.style.left = Math.random() * 100 + '%';
-    h.style.animationDelay = Math.random() * 12 + 's';
-    h.style.animationDuration = (10 + Math.random() * 8) + 's';
-    h.style.fontSize = (14 + Math.random() * 20) + 'px';
+    h.textContent = arr[i % arr.length];
+    h.style.left = (i * 12 + 5) + '%';
+    h.style.animationDelay = (i * 1.5) + 's';
+    h.style.animationDuration = (12 + (i % 4) * 2) + 's';
     box.appendChild(h);
   }
 }
@@ -324,7 +525,6 @@ function updateUI() {
   document.getElementById('dailyBudget').textContent = dailyBudget;
   document.getElementById('progress').style.width = Math.min(100, (todayTotal / dailyBudget) * 100) + '%';
   el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
-  if (!muted && todayTotal >= dailyBudget * 0.8 && todayTotal < dailyBudget) showToast('⚠️ ใกล้เกินงบแล้วน้า');
 }
 
 function updatePetUI() {
@@ -332,47 +532,33 @@ function updatePetUI() {
   document.getElementById('happyBar').style.width = pet.happy + '%';
   const expMax = pet.level * 100;
   document.getElementById('expBar').style.width = ((pet.exp % expMax) / expMax * 100) + '%';
-  document.getElementById('petLevel').textContent = 'Lv.' + pet.level + ' ✨ EXP ' + (pet.exp % expMax) + '/' + expMax;
+  document.getElementById('petLevel').textContent = 'Lv.' + pet.level + ' ✨ ' + (pet.exp % expMax) + '/' + expMax;
   const dog = document.getElementById('dog');
   dog.textContent = pet.happy < 30 ? '😢' : pet.hunger < 30 ? '🐕' : '🐶';
-  if (pet.happy < 20 || pet.hunger < 20) dog.classList.add('dog-sleeping');
-  else dog.classList.remove('dog-sleeping');
 }
 
 // ====== TOAST ======
+let toastTimer;
 function showToast(msg) {
+  const old = document.querySelector('.toast');
+  if (old) old.remove();
+  clearTimeout(toastTimer);
   const t = document.createElement('div');
+  t.className = 'toast';
   t.textContent = msg;
-  t.style.cssText = 'position:fixed;top:30px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.95);padding:12px 20px;border-radius:20px;box-shadow:0 6px 20px rgba(255,105,180,0.4);color:#FF1493;font-weight:700;z-index:9999;font-family:inherit;animation:popIn 0.4s;';
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2500);
+  toastTimer = setTimeout(() => t.remove(), 2000);
 }
 
-function playSound(type) {
-  if (muted) return;
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator(); const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.frequency.value = type === 'success' ? 800 : type === 'pet' ? 1000 : 500;
-    gain.gain.setValueAtTime(0.1, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
-    osc.start(); osc.stop(ctx.currentTime + 0.2);
-  } catch(e) {}
-}
+function haptic(ms = 20) { if (navigator.vibrate) navigator.vibrate(ms); }
 
-function haptic(ms = 30) { if (navigator.vibrate) navigator.vibrate(ms); }
-
-// ====== PET SYSTEM ======
-function savePetToFirebase() {
-  db.ref('pet').set({ ...pet, updatedAt: Date.now() });
-}
-
-function loadPetFromFirebase() {
+// ====== PET ======
+function savePet() { db.ref('pet').set({ ...pet, updatedAt: Date.now() }); }
+function loadPet() {
   db.ref('pet').once('value').then(snap => {
     const p = snap.val();
-    if (p) pet = { hunger: p.hunger ?? 100, happy: p.happy ?? 100, level: p.level ?? 1, exp: p.exp ?? 0, name: p.name || 'โบโบ้' };
-    else savePetToFirebase();
+    if (p) pet = { hunger: p.hunger ?? 100, happy: p.happy ?? 100, level: p.level ?? 1, exp: p.exp ?? 0 };
+    else savePet();
     updatePetUI();
   });
 }
@@ -384,71 +570,76 @@ function addExp(amount) {
     pet.level++;
     showToast('🎉 โบโบ้เลเวลอัป! Lv.' + pet.level);
     createConfetti();
-    playSound('success');
   }
-  savePetToFirebase(); updatePetUI();
+  savePet(); updatePetUI();
+}
+
+let lastActionTime = 0;
+function throttle() {
+  const now = Date.now();
+  if (now - lastActionTime < 400) return false;
+  lastActionTime = now;
+  return true;
 }
 
 function petDog() {
-  haptic(); playSound('pet');
+  if (!throttle()) return;
+  haptic();
   const dog = document.getElementById('dog');
   dog.classList.remove('happy'); void dog.offsetWidth; dog.classList.add('happy');
   pet.happy = Math.min(100, pet.happy + 5);
   addExp(3);
-  createHeartPopup(); updatePetUI();
-  const msgs = ['โบโบ้มีความสุขมาก 🐶💕','โบโบ้รักเธอจัง 🥰','โบโบ้หาง wag wag 🐕','โบโบ้อ้อน 💗','โบโบ้ยิ้มแล้ว ✨'];
+  createHeartPopup();
+  updatePetUI();
+  const msgs = ['โบโบ้รักเธอจัง 🥰','โบโบ้หาง wag wag 🐕','โบโบ้อ้อน 💗','โบโบ้ยิ้มแล้ว ✨'];
   showToast(msgs[Math.floor(Math.random() * msgs.length)]);
 }
 
 function feedDog() {
-  haptic(); playSound('pet');
+  if (!throttle()) return;
+  haptic();
   const dog = document.getElementById('dog');
   dog.classList.remove('eating'); void dog.offsetWidth; dog.classList.add('eating');
   pet.hunger = Math.min(100, pet.hunger + 15);
   pet.happy = Math.min(100, pet.happy + 5);
   addExp(5);
-  createHeartPopup(); updatePetUI();
+  updatePetUI();
   showToast('🍖 โบโบ้อิ่มแล้วน้า!');
 }
 
 function playDog() {
-  haptic(); playSound('success');
+  if (!throttle()) return;
+  haptic();
   const dog = document.getElementById('dog');
   dog.classList.remove('playing'); void dog.offsetWidth; dog.classList.add('playing');
   pet.happy = Math.min(100, pet.happy + 15);
   pet.hunger = Math.max(0, pet.hunger - 8);
   addExp(8);
-  createConfetti(); createHeartPopup(); updatePetUI();
+  createConfetti();
+  updatePetUI();
   showToast('🎾 โบโบ้เล่นสนุกมาก!');
 }
 
-// ลดความหิว/ความสุข ทุก 5 นาที
+// ลดลงทุก 10 นาที (เบาลง)
 setInterval(() => {
-  pet.hunger = Math.max(0, pet.hunger - 2);
+  pet.hunger = Math.max(0, pet.hunger - 1);
   pet.happy = Math.max(0, pet.happy - 1);
-  savePetToFirebase(); updatePetUI();
-  if (pet.hunger < 30) showToast('🍖 โบโบ้หิวแล้วน้า');
-  if (pet.happy < 30) showToast('💕 โบโบ้อยากเล่นด้วย');
-}, 5 * 60 * 1000);
+  savePet(); updatePetUI();
+}, 10 * 60 * 1000);
 
-// ====== MAP + GPS ======
+// ====== MAP ======
 function initMap() {
-  map = L.map('map').setView([13.7563, 100.5018], 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap', maxZoom: 19
-  }).addTo(map);
-  const dogIcon = L.divIcon({
-    html: '<div style="font-size:32px;text-align:center;line-height:1;">🐶</div>',
-    className: 'dog-marker', iconSize: [40, 40], iconAnchor: [20, 40]
-  });
+  if (map) return;
+  map = L.map('map', { zoomControl: true, attributionControl: false }).setView([13.7563, 100.5018], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+  const dogIcon = L.divIcon({ html: '<div style="font-size:30px;text-align:center;">🐶</div>', className: '', iconSize: [40, 40], iconAnchor: [20, 40] });
   marker = L.marker([13.7563, 100.5018], { icon: dogIcon }).addTo(map);
-  // โหลดตำแหน่งล่าสุด
-  db.ref('location').once('value').then(snap => {
+  db.ref('location').on('value', snap => {
     const loc = snap.val();
     if (loc && loc.lat) {
       map.setView([loc.lat, loc.lng], 16);
       marker.setLatLng([loc.lat, loc.lng]);
-      document.getElementById('locationInfo').innerHTML = '📍 <b>ตำแหน่งล่าสุด</b><br>ละติจูด: ' + loc.lat.toFixed(5) + '<br>ลองจิจูด: ' + loc.lng.toFixed(5) + '<br>อัปเดต: ' + loc.time;
+      document.getElementById('locationInfo').innerHTML = '📍 <b>ล่าสุด</b><br>ละติจูด: ' + loc.lat.toFixed(5) + '<br>ลองจิจูด: ' + loc.lng.toFixed(5) + '<br>อัปเดต: ' + loc.time;
     }
   });
 }
@@ -460,37 +651,38 @@ function updateLocation() {
     const lat = pos.coords.latitude, lng = pos.coords.longitude;
     const time = new Date().toLocaleString('th-TH');
     db.ref('location').set({ lat, lng, time, timestamp: Date.now() });
-    if (map) { map.setView([lat, lng], 16); marker.setLatLng([lat, lng]); }
-    document.getElementById('locationInfo').innerHTML = '📍 <b>ตำแหน่งล่าสุด</b><br>ละติจูด: ' + lat.toFixed(5) + '<br>ลองจิจูด: ' + lng.toFixed(5) + '<br>อัปเดต: ' + time;
-    showToast('📍 อัปเดตตำแหน่งแล้วน้า');
-    playSound('success');
+    showToast('📍 อัปเดตแล้วน้า');
   }, err => {
-    document.getElementById('locationInfo').textContent = '❌ หาตำแหน่งไม่ได้น้า';
+    document.getElementById('locationInfo').textContent = '❌ หาตำแหน่งไม่ได้';
     showToast('❌ หาตำแหน่งไม่ได้');
-  }, { enableHighAccuracy: true });
+  }, { enableHighAccuracy: true, timeout: 10000 });
 }
 
 // ====== FIREBASE ======
 function loadFromFirebase() {
-  db.ref('expenses').orderByChild('timestamp').once('value').then(snapshot => {
-    const all = [];
-    snapshot.forEach(child => { all.push({ ...child.val(), key: child.key }); });
-    const today = new Date().toISOString().slice(0, 10);
-    expenses = all.filter(e => e.date_key === currentMonth);
-    todayTotal = all.filter(e => e.day_key === today).reduce((s, e) => s + e.amount, 0);
+  db.ref('expenses').orderByChild('timestamp').on('value', snapshot => {
+    allExpenses = [];
+    snapshot.forEach(child => { allExpenses.push({ ...child.val(), key: child.key }); });
+
+    const now = new Date();
+    const todayKey = now.toISOString().slice(0, 10);
+    const monthKey = now.toISOString().slice(0, 7);
+
+    monthExpenses = allExpenses.filter(e => e.date_key === monthKey);
+    todayTotal = allExpenses.filter(e => e.day_key === todayKey).reduce((s, e) => s + e.amount, 0);
+
     db.ref('settings').once('value').then(snap => {
       const s = snap.val() || {};
       if (s.dailyBudget) dailyBudget = s.dailyBudget;
       if (s.avatar) document.getElementById('avatar').textContent = s.avatar;
-      if (s.theme) document.body.dataset.theme = s.theme;
-      if (s.font) document.body.style.fontFamily = "'" + s.font + "', cursive";
       document.getElementById('loadingBox').style.display = 'none';
       document.getElementById('mainContent').style.display = 'block';
-      renderQuickButtons(); updateUI();
-      loadPetFromFirebase();
-      setTimeout(initMap, 100);
+      renderQuickButtons();
+      updateUI();
+      loadPet();
+      if (!map) setTimeout(initMap, 200);
     });
-  }).catch(e => { console.log(e); document.getElementById('loadingBox').textContent = 'โหลดไม่ได้ 🥺'; });
+  });
 }
 
 function renderQuickButtons() {
@@ -503,8 +695,8 @@ function renderQuickButtons() {
   grid.innerHTML = '';
   arr.forEach(d => {
     const btn = document.createElement('button');
-    btn.className = 'quick-btn';
-    btn.innerHTML = '<span class="emoji">' + d.emoji + '</span>' + d.label;
+    btn.className = 'pet-btn';
+    btn.innerHTML = '<span class="ico">' + d.emoji + '</span>' + d.label;
     btn.onclick = () => quickAdd(d.label, d.amount);
     grid.appendChild(btn);
   });
@@ -513,8 +705,17 @@ function renderQuickButtons() {
 function quickAdd(label, amount) {
   haptic();
   const now = new Date();
-  const rec = { date: now.toLocaleDateString('th-TH'), time: now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}), item: label, amount, category: '✨ อื่นๆ', date_key: now.toISOString().slice(0,7), day_key: now.toISOString().slice(0,10), timestamp: Date.now() };
-  db.ref('expenses/' + rec.timestamp).set(rec).then(() => { createHeartPopup(); createConfetti(); playSound('success'); loadFromFirebase(); });
+  const rec = {
+    date: now.toLocaleDateString('th-TH'),
+    time: now.toLocaleTimeString('th-TH', {hour:'2-digit',minute:'2-digit'}),
+    item: label, amount, category: '✨ อื่นๆ',
+    date_key: now.toISOString().slice(0,7),
+    day_key: now.toISOString().slice(0,10),
+    timestamp: Date.now()
+  };
+  db.ref('expenses/' + rec.timestamp).set(rec);
+  createHeartPopup();
+  createConfetti();
 }
 
 function openAdd() { document.getElementById('addModal').classList.add('show'); haptic(); }
@@ -527,126 +728,178 @@ function saveExpense() {
   if (!amount || amount <= 0) { alert('ใส่จำนวนเงินก่อนน้า 🥺'); return; }
   haptic();
   const now = new Date();
-  const rec = { date: now.toLocaleDateString('th-TH'), time: now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}), item, amount, category, date_key: now.toISOString().slice(0,7), day_key: now.toISOString().slice(0,10), timestamp: Date.now() };
-  db.ref('expenses/' + rec.timestamp).set(rec).then(() => {
-    createHeartPopup(); createConfetti(); playSound('success');
-    document.getElementById('itemInput').value = ''; document.getElementById('amountInput').value = '';
-    closeAdd(); loadFromFirebase();
-    if (todayTotal + amount > dailyBudget) {
-      setTimeout(() => {
-        document.getElementById('mainCard').classList.add('shake');
-        haptic(200); showToast('🥺 เกินงบแล้วน้า!');
-        setTimeout(() => document.getElementById('mainCard').classList.remove('shake'), 500);
-      }, 500);
-    }
-  }).catch(e => { console.log(e); alert('ส่งไม่ได้น้า 🥺'); });
+  const rec = {
+    date: now.toLocaleDateString('th-TH'),
+    time: now.toLocaleTimeString('th-TH', {hour:'2-digit',minute:'2-digit'}),
+    item, amount, category,
+    date_key: now.toISOString().slice(0,7),
+    day_key: now.toISOString().slice(0,10),
+    timestamp: Date.now()
+  };
+  db.ref('expenses/' + rec.timestamp).set(rec);
+  document.getElementById('itemInput').value = '';
+  document.getElementById('amountInput').value = '';
+  closeAdd();
+  createHeartPopup();
+  createConfetti();
+  if (todayTotal + amount > dailyBudget) {
+    setTimeout(() => {
+      document.getElementById('mainCard').style.animation = 'none';
+      showToast('🥺 เกินงบแล้วน้า!');
+    }, 300);
+  }
 }
 
 function createHeartPopup() {
-  const x = window.innerWidth / 2, y = window.innerHeight / 2;
-  const hearts = ['💖','💕','🎀','✨','💗','🌸','💝','💞'];
-  for (let i = 0; i < 8; i++) {
+  const x = window.innerWidth / 2;
+  const y = window.innerHeight / 2;
+  const hearts = ['💖','💕','🎀','✨'];
+  for (let i = 0; i < 4; i++) {
     const h = document.createElement('div');
-    h.className = 'heart-popup'; h.textContent = hearts[i];
-    h.style.left = (x - 20 + (Math.random() - 0.5) * 250) + 'px';
-    h.style.top = y + 'px'; h.style.animationDelay = (i * 0.1) + 's';
-    document.body.appendChild(h); setTimeout(() => h.remove(), 1600);
+    h.className = 'heart-popup';
+    h.textContent = hearts[i];
+    h.style.left = (x - 20 + (Math.random() - 0.5) * 120) + 'px';
+    h.style.top = y + 'px';
+    h.style.animationDelay = (i * 0.08) + 's';
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 1300);
   }
 }
 
 function createConfetti() {
-  const colors = ['#FF69B4','#FFB6C1','#FFD700','#87CEEB','#DDA0DD','#98FB98'];
-  for (let i = 0; i < 30; i++) {
-    const c = document.createElement('div'); c.className = 'confetti';
+  const colors = ['#FF69B4','#FFB6C1','#FFD700','#87CEEB'];
+  for (let i = 0; i < 12; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
     c.style.left = Math.random() * 100 + '%';
-    c.style.background = colors[Math.floor(Math.random() * colors.length)];
-    c.style.animationDelay = Math.random() * 0.5 + 's';
-    c.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
-    document.body.appendChild(c); setTimeout(() => c.remove(), 2500);
+    c.style.background = colors[i % colors.length];
+    c.style.animationDelay = Math.random() * 0.3 + 's';
+    if (Math.random() > 0.5) c.style.borderRadius = '50%';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 2000);
   }
 }
 
-function reactEmoji(emoji) {
-  haptic();
-  const msgs = { '🐻':'หมีรักนะ 🧸', '🐼':'แพนด้าน่ารัก 🐼', '🐰':'กระต่ายคิดถึง 🐰', '🎀':'โบว์สวยจัง 🎀' };
-  showToast(msgs[emoji]);
-  for (let i = 0; i < 3; i++) setTimeout(() => {
-    const h = document.createElement('div'); h.className = 'heart-popup'; h.textContent = emoji;
-    h.style.left = (window.innerWidth / 2 - 30 + Math.random() * 60) + 'px';
-    h.style.top = (window.innerHeight / 2) + 'px';
-    document.body.appendChild(h); setTimeout(() => h.remove(), 1500);
-  }, i * 200);
-}
-
+// ====== HISTORY ======
 function toggleHistory() {
   haptic();
   const box = document.getElementById('historyBox');
   if (box.style.display === 'none') {
-    let html = '<div class="card" style="text-align:left;">';
-    if (expenses.length === 0) html += '<div style="text-align:center;">ยังไม่มีรายการน้า 🐰</div>';
-    else [...expenses].reverse().forEach((e, i) => {
+    let html = '<div class="zone" style="text-align:left;">';
+    if (monthExpenses.length === 0) html += '<div style="text-align:center;">ยังไม่มีรายการน้า 🐰</div>';
+    else [...monthExpenses].reverse().forEach(e => {
       const isFav = favorites.includes(e.key);
-      html += '<div class="history-item" style="animation-delay:' + (i * 0.05) + 's"><div class="info"><b>' + e.item + '</b> ' + (e.category || '') + '<br><span class="time">' + e.time + '</span></div><div class="actions"><button class="fav-btn ' + (isFav ? 'active' : '') + '" onclick="toggleFav(\'' + e.key + '\')">⭐</button><button onclick="editItem(\'' + e.key + '\')">✏️</button><button onclick="deleteItem(\'' + e.key + '\')">🗑️</button></div></div>';
+      html += '<div class="history-item"><div class="info"><b>' + e.item + '</b> ' + (e.category || '') + '<br><span class="time">' + e.time + '</span></div><div class="actions"><button class="fav-btn ' + (isFav ? 'active' : '') + '" onclick="toggleFav(\'' + e.key + '\')">⭐</button><button onclick="editItem(\'' + e.key + '\')">✏️</button><button onclick="deleteItem(\'' + e.key + '\')">🗑️</button></div></div>';
     });
     html += '</div>';
     box.innerHTML = html; box.style.display = 'block';
   } else box.style.display = 'none';
 }
-function toggleFav(key) { haptic(); const i = favorites.indexOf(key); if (i > -1) favorites.splice(i, 1); else favorites.push(key); localStorage.setItem('favorites', JSON.stringify(favorites)); toggleHistory(); toggleHistory(); }
-function deleteItem(key) { if (!confirm('ลบรายการนี้เลยไหม?')) return; haptic(); db.ref('expenses/' + key).remove().then(() => { loadFromFirebase(); toggleHistory(); toggleHistory(); }); }
-function editItem(key) {
-  const item = expenses.find(e => e.key === key); if (!item) return;
-  const n = prompt('แก้ชื่อรายการ:', item.item); if (n === null) return;
-  const a = prompt('แก้จำนวนเงิน:', item.amount); if (a === null) return;
-  db.ref('expenses/' + key).update({ item: n, amount: parseFloat(a) }).then(() => { loadFromFirebase(); toggleHistory(); toggleHistory(); });
+
+function toggleFav(key) {
+  haptic();
+  const i = favorites.indexOf(key);
+  if (i > -1) favorites.splice(i, 1); else favorites.push(key);
+  localStorage.setItem('favorites', JSON.stringify(favorites));
+  toggleHistory(); toggleHistory();
 }
 
+function deleteItem(key) {
+  if (!confirm('ลบรายการนี้เลยไหม?')) return;
+  haptic();
+  db.ref('expenses/' + key).remove();
+  toggleHistory(); toggleHistory();
+}
+
+function editItem(key) {
+  const item = allExpenses.find(e => e.key === key);
+  if (!item) return;
+  const n = prompt('แก้ชื่อรายการ:', item.item); if (n === null) return;
+  const a = prompt('แก้จำนวนเงิน:', item.amount); if (a === null) return;
+  db.ref('expenses/' + key).update({ item: n, amount: parseFloat(a) });
+  toggleHistory(); toggleHistory();
+}
+
+// ====== CHART (แก้ให้ใช้ allExpenses) ======
 function toggleChart() {
   haptic();
   const box = document.getElementById('chartBox');
   if (box.style.display === 'none') {
-    const days = []; const labels = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+    const labels = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+    const days = [];
     for (let i = 6; i >= 0; i--) {
-      const d = new Date(); d.setDate(d.getDate() - i);
-      const key = d.toISOString().slice(0, 10);
-      days.push({ label: labels[d.getDay()], total: expenses.filter(e => e.day_key === key).reduce((s, e) => s + e.amount, 0) });
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      const total = allExpenses.filter(e => e.day_key === key).reduce((s, e) => s + e.amount, 0);
+      days.push({ label: labels[d.getDay()], total });
     }
     const max = Math.max(...days.map(d => d.total), 1);
-    let html = '<div class="card"><div style="font-weight:700;margin-bottom:10px;">📊 รายจ่าย 7 วัน</div><div class="chart">';
-    days.forEach(d => { html += '<div style="display:flex;flex-direction:column;align-items:center;"><div class="bar" style="height:' + ((d.total / max) * 100) + 'px;min-height:4px;"></div><div style="font-size:10px;margin-top:5px;">' + d.label + '</div></div>'; });
-    html += '</div><div style="text-align:center;font-size:12px;">รวม ' + days.reduce((s, d) => s + d.total, 0) + ' บาท</div></div>';
-    box.innerHTML = html; box.style.display = 'block';
+    let html = '<div class="zone"><div style="font-weight:700;text-align:center;margin-bottom:10px;">📊 รายจ่าย 7 วัน</div><div class="chart">';
+    days.forEach(d => {
+      const h = Math.max(4, (d.total / max) * 100);
+      html += '<div style="display:flex;flex-direction:column;align-items:center;flex:1;"><div class="bar" style="height:' + h + 'px;"></div><div style="font-size:10px;margin-top:6px;color:#C71585;font-weight:600;">' + d.label + '</div><div style="font-size:9px;color:#FF69B4;">' + d.total + '</div></div>';
+    });
+    html += '</div><div style="text-align:center;font-size:13px;color:#C71585;">รวม ' + days.reduce((s, d) => s + d.total, 0) + ' บาท</div></div>';
+    box.innerHTML = html;
+    box.style.display = 'block';
   } else box.style.display = 'none';
 }
 
+// ====== CHAT (แก้ให้ใช้ on + fallback) ======
+let chatListenerActive = false;
 function openChat() {
   haptic();
   const box = document.getElementById('chatBox');
   if (box.style.display === 'none') {
-    db.ref('messages').orderByChild('timestamp').limitToLast(20).once('value').then(snap => {
-      const msgs = []; snap.forEach(c => msgs.push(c.val()));
-      let html = '<div class="card" style="text-align:left;"><div style="font-weight:700;margin-bottom:10px;">💌 ข้อความจากที่รัก</div>';
-      if (msgs.length === 0) html += '<div style="text-align:center;">ยังไม่มีข้อความน้า 🐰</div>';
-      else [...msgs].reverse().forEach(m => { html += '<div style="background:#FFF0F5;padding:12px;border-radius:15px;margin-bottom:8px;"><b>' + (m.emoji || '💕') + '</b> ' + m.text + '<div style="font-size:10px;color:#FF69B4;margin-top:5px;">' + m.time + '</div></div>'; });
+    box.innerHTML = '<div class="zone" style="text-align:center;">💕 กำลังโหลดข้อความ...</div>';
+    box.style.display = 'block';
+    db.ref('messages').orderByChild('timestamp').limitToLast(30).on('value', snap => {
+      const msgs = [];
+      snap.forEach(c => msgs.push(c.val()));
+      let html = '<div class="zone" style="text-align:left;"><div style="font-weight:700;text-align:center;margin-bottom:10px;">💌 ข้อความจากที่รัก</div>';
+      if (msgs.length === 0) {
+        html += '<div style="text-align:center;color:#FF69B4;font-size:14px;">ยังไม่มีข้อความน้า 🐰<br><span style="font-size:12px;">รอที่รักส่งมานะ 💕</span></div>';
+      } else {
+        [...msgs].reverse().forEach(m => {
+          html += '<div class="chat-msg"><b style="font-size:18px;">' + (m.emoji || '💕') + '</b> ' + m.text + '<div class="chat-meta">' + m.time + '</div></div>';
+        });
+      }
       html += '</div>';
-      box.innerHTML = html; box.style.display = 'block';
+      box.innerHTML = html;
+    }, err => {
+      box.innerHTML = '<div class="zone" style="text-align:center;">❌ โหลดข้อความไม่ได้<br><span style="font-size:12px;">ลองปิด-เปิดใหม่นะ</span></div>';
+      console.log(err);
     });
-  } else box.style.display = 'none';
+    chatListenerActive = true;
+  } else {
+    box.style.display = 'none';
+    if (chatListenerActive) {
+      db.ref('messages').off();
+      chatListenerActive = false;
+    }
+  }
 }
 
-function openSettings() { haptic(); document.getElementById('budgetInput').value = dailyBudget; document.getElementById('avatarInput').value = document.getElementById('avatar').textContent; document.getElementById('settingsModal').classList.add('show'); }
+// ====== SETTINGS ======
+function openSettings() {
+  haptic();
+  document.getElementById('budgetInput').value = dailyBudget;
+  document.getElementById('avatarInput').value = document.getElementById('avatar').textContent;
+  document.getElementById('settingsModal').classList.add('show');
+}
 function closeSettings() { document.getElementById('settingsModal').classList.remove('show'); }
-function setTheme(t) { document.body.dataset.theme = t; haptic(); }
-function setFont(f) { document.body.style.fontFamily = "'" + f + "', cursive"; haptic(); }
+function setTheme(t) { haptic(); document.body.dataset.theme = t; }
 
 function saveSettings() {
   const budget = parseFloat(document.getElementById('budgetInput').value) || 100;
   const avatar = document.getElementById('avatarInput').value || '🧸';
-  const theme = document.body.dataset.theme;
-  const font = document.body.style.fontFamily.split("'")[1] || 'Mali';
-  db.ref('settings').set({ dailyBudget: budget, avatar, theme, font });
-  dailyBudget = budget; document.getElementById('avatar').textContent = avatar;
-  closeSettings(); updateUI(); showToast('บันทึกแล้วน้า 💕');
+  db.ref('settings').update({ dailyBudget: budget, avatar });
+  dailyBudget = budget;
+  document.getElementById('avatar').textContent = avatar;
+  closeSettings();
+  updateUI();
+  showToast('บันทึกแล้วน้า 💕');
 }
 
 function toggleMute() {
@@ -656,16 +909,13 @@ function toggleMute() {
   localStorage.setItem('muted', muted);
 }
 
-// CSS animation เพิ่ม
-const style = document.createElement('style');
-style.textContent = '@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}';
-document.head.appendChild(style);
-
 // ====== INIT ======
 muted = localStorage.getItem('muted') === 'true';
-if (muted) { document.getElementById('muteBtn').textContent = '🔕'; document.getElementById('muteBtn').classList.add('muted'); }
-updateAnniversary(); updateQuote(); loadFromFirebase();
-setInterval(updateQuote, 60000);
+if (muted) {
+  document.getElementById('muteBtn').textContent = '🔕';
+  document.getElementById('muteBtn').classList.add('muted');
+}
+loadFromFirebase();
 </script>
 </body>
 </html>
