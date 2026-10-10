@@ -4,158 +4,320 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🧸 กระเป๋าหนู</title>
-<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&family=Itim&family=Prompt:wght@400;600&family=Kanit:wght@400;600&family=Sarabun:wght@400;600&family=Chakra+Petch:wght@400;600&display=swap" rel="stylesheet">
 <style>
+  /* ============ THEME VARIABLES ============ */
+  :root {
+    --primary:#FF69B4; --primary-dark:#FF1493; --primary-light:#FFB6C1;
+    --bg1:#FFE4EC; --bg2:#FFC0CB; --bg3:#FFB6C1;
+    --text:#C71585; --text-light:#FF69B4;
+    --card:rgba(255,255,255,0.9);
+    --card-border:rgba(255,255,255,0.95);
+    --shadow:rgba(255,105,180,0.3);
+    --heart1:#FFB6C1; --heart2:#FF69B4; --heart3:#FF1493;
+    --font:'Mali',cursive;
+    --accent-glow:rgba(255,105,180,0.4);
+  }
+  body[data-theme="sakura"] {
+    --primary:#FF85A2; --primary-dark:#E91E63; --primary-light:#FFC1CC;
+    --bg1:#FFF0F5; --bg2:#FFDCE5; --bg3:#FFC1CC;
+    --text:#B03060; --text-light:#E91E63;
+    --shadow:rgba(255,133,162,0.35);
+  }
+  body[data-theme="peach"] {
+    --primary:#FFB07C; --primary-dark:#FF8C42; --primary-light:#FFD8B8;
+    --bg1:#FFF5EC; --bg2:#FFE5CC; --bg3:#FFD1A8;
+    --text:#C55A11; --text-light:#FF8C42;
+    --card:rgba(255,255,255,0.92);
+    --shadow:rgba(255,176,124,0.35);
+  }
+  body[data-theme="mint"] {
+    --primary:#7DD8A8; --primary-dark:#3CB371; --primary-light:#C8F5D8;
+    --bg1:#EEFFF5; --bg2:#D4F5E0; --bg3:#B8EBC8;
+    --text:#2E7D52; --text-light:#3CB371;
+    --shadow:rgba(125,216,168,0.35);
+  }
+  body[data-theme="sky"] {
+    --primary:#7EC8E3; --primary-dark:#4A90C2; --primary-light:#C2E8F5;
+    --bg1:#EEF8FF; --bg2:#D6EEFB; --bg3:#B8DEF2;
+    --text:#2E5F8A; --text-light:#4A90C2;
+    --shadow:rgba(126,200,227,0.35);
+  }
+  body[data-theme="lavender"] {
+    --primary:#C8A8E9; --primary-dark:#9370DB; --primary-light:#E6D0F5;
+    --bg1:#F5EEFF; --bg2:#E8DAF8; --bg3:#D8C0F0;
+    --text:#6B3FA0; --text-light:#9370DB;
+    --shadow:rgba(200,168,233,0.35);
+  }
+  body[data-theme="midnight"] {
+    --primary:#FF69B4; --primary-dark:#FF1493; --primary-light:#FF85C0;
+    --bg1:#1A1020; --bg2:#2A1A35; --bg3:#3D2850;
+    --text:#FFB6D9; --text-light:#FF85C0;
+    --card:rgba(60,40,75,0.85);
+    --card-border:rgba(120,80,140,0.6);
+    --shadow:rgba(255,105,180,0.4);
+    --accent-glow:rgba(255,105,180,0.6);
+  }
+
+  /* ============ BASE ============ */
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-  html,body{overscroll-behavior:none;}
+  html,body{overscroll-behavior:none;height:100%;}
   body{
-    font-family:'Mali',cursive;
-    background:linear-gradient(135deg,#FFE4EC 0%,#FFC0CB 50%,#FFB6C1 100%);
-    min-height:100vh;padding:16px;color:#C71585;
+    font-family:var(--font);
+    background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 50%,var(--bg3) 100%);
+    min-height:100vh;padding:16px;color:var(--text);
     overflow-x:hidden;position:relative;
     -webkit-font-smoothing:antialiased;
+    transition:background 0.6s ease,color 0.4s ease;
+    padding-bottom:100px;
   }
 
-  /* === BG hearts (ลดจำนวนเพื่อลื่น) === */
-  .bg-hearts{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;}
+  /* ============ BG EFFECTS ============ */
+  .bg-hearts{
+    position:fixed;top:0;left:0;width:100%;height:100%;
+    pointer-events:none;z-index:0;overflow:hidden;
+  }
   .bg-hearts span{
-    position:absolute;font-size:18px;
+    position:absolute;font-size:16px;
     will-change:transform;
-    animation:floatUp 14s linear infinite;
+    animation:floatUp 16s linear infinite;
   }
   @keyframes floatUp{
-    0%{transform:translate3d(0,100vh,0) rotate(0);opacity:0}
-    10%{opacity:0.5}
-    90%{opacity:0.5}
-    100%{transform:translate3d(0,-10vh,0) rotate(360deg);opacity:0}
+    0%{transform:translate3d(0,100vh,0);opacity:0}
+    10%{opacity:0.55}
+    90%{opacity:0.55}
+    100%{transform:translate3d(0,-10vh,0);opacity:0}
   }
 
-  .container{max-width:420px;margin:0 auto;position:relative;z-index:1;}
+  .container{max-width:440px;margin:0 auto;position:relative;z-index:1;}
 
-  /* === Top bar === */
-  .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  /* ============ TOP BAR ============ */
+  .top-bar{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:10px;gap:6px;
+  }
   .avatar{
-    width:44px;height:44px;border-radius:50%;
-    background:linear-gradient(135deg,#FFB6C1,#FF69B4);
+    width:42px;height:42px;border-radius:50%;
+    background:linear-gradient(135deg,var(--primary-light),var(--primary));
     display:flex;align-items:center;justify-content:center;
-    font-size:22px;cursor:pointer;
-    box-shadow:0 4px 12px rgba(255,105,180,0.3);
-    border:3px solid white;
+    font-size:20px;cursor:pointer;
+    box-shadow:0 4px 12px var(--shadow);
+    border:2px solid white;
     transition:transform 0.2s;
+    flex-shrink:0;
   }
   .avatar:active{transform:scale(0.9);}
+  .top-icons{display:flex;gap:6px;align-items:center;}
   .icon-btn{
-    width:40px;height:40px;border-radius:50%;
-    background:rgba(255,255,255,0.75);
+    width:38px;height:38px;border-radius:50%;
+    background:var(--card);
     backdrop-filter:blur(8px);
     display:flex;align-items:center;justify-content:center;
-    font-size:19px;cursor:pointer;
-    border:2px solid rgba(255,255,255,0.9);
+    font-size:17px;cursor:pointer;
+    border:2px solid var(--card-border);
     transition:transform 0.2s;
+    position:relative;
   }
   .icon-btn:active{transform:scale(0.9);}
   .icon-btn.muted{opacity:0.5;}
-  .top-icons{display:flex;gap:8px;}
+  .icon-btn .badge{
+    position:absolute;top:-2px;right:-2px;
+    background:#FF1493;color:white;
+    font-size:10px;font-weight:700;
+    min-width:18px;height:18px;
+    border-radius:9px;
+    display:flex;align-items:center;justify-content:center;
+    padding:0 5px;
+    border:2px solid white;
+    font-family:sans-serif;
+  }
 
+  /* ============ SIDE MENU ============ */
+  .menu-overlay{
+    position:fixed;top:0;left:0;width:100%;height:100%;
+    background:rgba(0,0,0,0.4);
+    z-index:200;opacity:0;pointer-events:none;
+    transition:opacity 0.3s;
+    backdrop-filter:blur(2px);
+  }
+  .menu-overlay.show{opacity:1;pointer-events:auto;}
+
+  .side-menu{
+    position:fixed;top:0;right:0;
+    width:260px;height:100%;
+    background:linear-gradient(180deg,var(--card) 0%,var(--bg1) 100%);
+    backdrop-filter:blur(20px);
+    z-index:201;
+    transform:translateX(100%);
+    transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    padding:24px 16px;
+    box-shadow:-10px 0 30px rgba(0,0,0,0.2);
+    overflow-y:auto;
+    border-left:3px solid var(--primary-light);
+  }
+  .side-menu.show{transform:translateX(0);}
+  .menu-header{
+    text-align:center;font-size:20px;font-weight:700;
+    color:var(--primary-dark);margin-bottom:20px;
+    padding-bottom:14px;
+    border-bottom:2px dashed var(--primary-light);
+  }
+  .menu-item{
+    padding:14px 16px;
+    background:var(--bg1);
+    border-radius:16px;
+    margin-bottom:10px;
+    cursor:pointer;
+    font-weight:600;
+    font-size:15px;
+    display:flex;align-items:center;gap:12px;
+    border:2px solid var(--card-border);
+    transition:transform 0.15s,background 0.2s;
+    color:var(--text);
+    font-family:inherit;
+  }
+  .menu-item:active{transform:scale(0.97);background:var(--primary-light);}
+  .menu-item .mi-icon{font-size:22px;}
+
+  /* ============ HEADER ============ */
   .header{
     text-align:center;font-size:24px;font-weight:700;margin:8px 0;
-    background:linear-gradient(135deg,#FF69B4,#FF1493);
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;
     background-clip:text;
   }
 
-  /* === TIME COUNTER (ใหม่) === */
+  /* ============ TIME COUNTER ============ */
   .time-counter{
     text-align:center;
-    background:linear-gradient(135deg,rgba(255,255,255,0.9),rgba(255,240,245,0.9));
-    border-radius:20px;padding:12px;margin-bottom:12px;
-    border:2px solid rgba(255,255,255,0.9);
-    box-shadow:0 4px 15px rgba(255,105,180,0.2);
-    font-size:13px;font-weight:600;color:#C71585;
+    background:var(--card);
+    backdrop-filter:blur(10px);
+    border-radius:20px;padding:12px 14px;margin-bottom:14px;
+    border:2px solid var(--card-border);
+    box-shadow:0 4px 15px var(--shadow);
+    font-size:13px;font-weight:600;color:var(--text);
+  }
+  .time-counter .time-label{
+    font-size:12px;color:var(--text-light);margin-bottom:6px;
   }
   .time-counter .time-display{
-    font-size:15px;font-weight:700;color:#FF1493;margin-top:4px;
     display:flex;justify-content:center;gap:6px;flex-wrap:wrap;
+    font-size:14px;font-weight:700;color:var(--primary-dark);
   }
   .time-counter .time-display span{
-    background:rgba(255,182,193,0.4);
-    padding:2px 8px;border-radius:10px;
-    min-width:36px;
+    background:var(--bg1);
+    padding:4px 10px;border-radius:12px;
+    min-width:42px;
+    border:1px solid var(--primary-light);
+    transition:transform 0.2s;
   }
+  .time-counter .time-display span.tick{transform:scale(1.08);}
 
-  /* === MONEY ZONE (แยกชัดเจน) === */
+  /* ============ MONEY ZONE ============ */
   .zone-label{
-    font-size:15px;font-weight:700;color:#FF1493;
-    margin:15px 0 8px;padding-left:4px;
+    font-size:15px;font-weight:700;color:var(--primary-dark);
+    margin:14px 0 8px;padding-left:4px;
     display:flex;align-items:center;gap:6px;
   }
   .money-zone{
-    background:linear-gradient(135deg,#FFFFFF 0%,#FFF5F8 100%);
-    border-radius:28px;padding:22px;
-    border:3px solid #FF69B4;
-    box-shadow:0 8px 25px rgba(255,105,180,0.35),
-               0 0 0 6px rgba(255,182,193,0.2);
-    text-align:center;margin-bottom:8px;
-    position:relative;overflow:hidden;
+    background:linear-gradient(135deg,var(--card) 0%,var(--bg1) 100%);
+    border-radius:26px;padding:22px;
+    border:3px solid var(--primary);
+    box-shadow:0 8px 25px var(--shadow),
+               0 0 0 5px var(--primary-light);
+    text-align:center;position:relative;overflow:hidden;
+  }
+  body[data-theme="midnight"] .money-zone{
+    box-shadow:0 8px 25px var(--shadow),
+               0 0 0 5px rgba(255,105,180,0.3);
   }
   .money-zone::before{
     content:'';position:absolute;top:0;left:0;right:0;height:4px;
-    background:linear-gradient(90deg,#FFB6C1,#FF69B4,#FF1493,#FF69B4,#FFB6C1);
+    background:linear-gradient(90deg,var(--primary-light),var(--primary),var(--primary-dark),var(--primary),var(--primary-light));
     background-size:200% 100%;
     animation:shimmerTop 3s linear infinite;
   }
   @keyframes shimmerTop{0%{background-position:200% 0}100%{background-position:-200% 0}}
-  .money-zone .label{font-size:13px;color:#FF69B4;font-weight:600;}
+  .money-zone .label{font-size:13px;color:var(--text-light);font-weight:600;}
   .money-zone .remain{
-    font-size:60px;font-weight:700;line-height:1;margin:6px 0;
-    background:linear-gradient(135deg,#FF69B4,#FF1493);
+    font-size:56px;font-weight:700;line-height:1;margin:6px 0;
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;
     background-clip:text;
+    transition:transform 0.3s;
   }
   .money-zone .remain.pulse{animation:pulse 0.5s ease-out;}
   @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
   .progress-bar{
-    background:rgba(255,228,236,0.8);border-radius:20px;height:18px;
+    background:var(--bg1);border-radius:20px;height:16px;
     margin:12px 0;overflow:hidden;
-    box-shadow:inset 0 2px 5px rgba(255,105,180,0.15);
+    box-shadow:inset 0 2px 5px rgba(0,0,0,0.08);
+    border:1px solid var(--primary-light);
   }
   .progress-fill{
     height:100%;border-radius:20px;
-    background:linear-gradient(90deg,#FFB6C1,#FF69B4,#FF1493);
+    background:linear-gradient(90deg,var(--primary-light),var(--primary),var(--primary-dark));
     background-size:200% 100%;
     transition:width 0.6s ease-out;
     animation:shimmer 2s linear infinite;
     will-change:width;
   }
   @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-  .money-zone .stats{font-size:14px;color:#FF69B4;font-weight:600;margin-top:8px;}
-
-  /* === ZONES === */
-  .zone{
-    background:rgba(255,255,255,0.88);
-    border-radius:26px;padding:20px;
-    margin-bottom:12px;
-    border:2px solid rgba(255,255,255,0.95);
-    box-shadow:0 6px 20px rgba(255,105,180,0.2);
+  .money-zone .stats{
+    font-size:13px;color:var(--text-light);font-weight:600;margin-top:8px;
   }
 
-  /* === PET === */
-  .pet-name{font-size:18px;font-weight:700;color:#FF1493;text-align:center;margin-bottom:4px;}
+  /* ============ MONEY BUTTONS ============ */
+  .money-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+
+  button.main-btn{
+    width:100%;padding:14px;border:none;border-radius:18px;
+    background:linear-gradient(135deg,var(--primary-light),var(--primary));
+    color:white;font-size:15px;font-weight:700;
+    margin-bottom:10px;cursor:pointer;font-family:inherit;
+    box-shadow:0 4px 14px var(--shadow);
+    transition:transform 0.15s, box-shadow 0.15s;
+    will-change:transform;
+  }
+  button.main-btn:active{
+    transform:scale(0.96);
+    box-shadow:0 2px 8px var(--shadow);
+  }
+  button.ghost{
+    background:var(--card);
+    color:var(--text);
+    border:2px solid var(--primary-light);
+    box-shadow:none;
+  }
+  button.ghost:active{background:var(--bg1);}
+
+  /* ============ PET ZONE ============ */
+  .zone{
+    background:var(--card);
+    backdrop-filter:blur(10px);
+    border-radius:24px;padding:18px;
+    margin-bottom:12px;
+    border:2px solid var(--card-border);
+    box-shadow:0 6px 20px var(--shadow);
+  }
+  .pet-name{font-size:17px;font-weight:700;color:var(--primary-dark);text-align:center;margin-bottom:4px;}
   .pet-level{
-    font-size:12px;color:#FF69B4;background:rgba(255,255,255,0.8);
-    padding:4px 12px;border-radius:12px;display:inline-block;margin-bottom:8px;
+    font-size:12px;color:var(--text-light);background:var(--bg1);
+    padding:4px 12px;border-radius:12px;
+    display:inline-block;margin-bottom:8px;
+    border:1px solid var(--primary-light);
   }
   .pet-stage{
     height:130px;display:flex;align-items:center;justify-content:center;
     position:relative;perspective:600px;
   }
   .dog{
-    font-size:80px;cursor:pointer;user-select:none;
+    font-size:78px;cursor:pointer;user-select:none;
     will-change:transform;
     animation:dogIdle 3s ease-in-out infinite;
-    filter:drop-shadow(0 6px 12px rgba(255,105,180,0.3));
+    filter:drop-shadow(0 6px 12px var(--shadow));
     transition:filter 0.2s;
+    display:inline-block;
   }
   @keyframes dogIdle{
     0%,100%{transform:translate3d(0,0,0) rotate(-3deg)}
@@ -180,100 +342,204 @@
   }
   .pet-stats{display:flex;gap:8px;margin:12px 0;}
   .pet-stat{
-    flex:1;background:rgba(255,240,245,0.9);
+    flex:1;background:var(--bg1);
     border-radius:14px;padding:8px;
-    border:2px solid rgba(255,255,255,0.9);
+    border:1px solid var(--primary-light);
   }
-  .pet-stat-label{font-size:11px;font-weight:600;margin-bottom:5px;color:#C71585;}
-  .pet-stat-bar{background:#FFE4EC;border-radius:8px;height:10px;overflow:hidden;}
+  .pet-stat-label{font-size:11px;font-weight:600;margin-bottom:5px;color:var(--text);}
+  .pet-stat-bar{background:var(--card);border-radius:8px;height:10px;overflow:hidden;}
   .pet-stat-fill{height:100%;border-radius:8px;transition:width 0.6s ease-out;}
-  .fill-hunger{background:linear-gradient(90deg,#FFB6C1,#FF69B4);}
+  .fill-hunger{background:linear-gradient(90deg,var(--primary-light),var(--primary));}
   .fill-happy{background:linear-gradient(90deg,#FFD700,#FFA500);}
-  .exp-bar{background:#FFE4EC;border-radius:8px;height:6px;margin-top:6px;overflow:hidden;}
-  .exp-fill{height:100%;background:linear-gradient(90deg,#FFD700,#FF69B4);border-radius:8px;transition:width 0.4s;}
+  .exp-bar{background:var(--bg1);border-radius:8px;height:6px;margin-top:6px;overflow:hidden;}
+  .exp-fill{height:100%;background:linear-gradient(90deg,#FFD700,var(--primary));border-radius:8px;transition:width 0.4s;}
   .pet-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;}
   .pet-btn{
     padding:12px 6px;border:none;border-radius:16px;
-    background:linear-gradient(135deg,#FFF0F5,#FFE4EC);
-    color:#FF1493;font-size:12px;font-weight:700;
+    background:var(--bg1);
+    color:var(--primary-dark);font-size:12px;font-weight:700;
     cursor:pointer;font-family:inherit;
-    border:2px solid rgba(255,255,255,0.9);
-    transition:transform 0.15s;
+    border:2px solid var(--card-border);
+    transition:transform 0.15s,background 0.2s;
   }
-  .pet-btn:active{transform:scale(0.92);}
+  .pet-btn:active{transform:scale(0.92);background:var(--primary-light);color:white;}
   .pet-btn .ico{font-size:22px;display:block;margin-bottom:3px;}
 
-  /* === MAP === */
-  #map{height:200px;border-radius:18px;margin:8px 0;border:2px solid white;}
-  .location-info{font-size:12px;background:rgba(255,240,245,0.9);padding:8px 12px;border-radius:12px;margin-top:8px;line-height:1.5;}
-  .location-info b{color:#FF1493;}
+  /* ============ QUICK BUTTONS ============ */
+  #quickGrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 
-  /* === Main buttons === */
-  button.main-btn{
-    width:100%;padding:15px;border:none;border-radius:20px;
-    background:linear-gradient(135deg,#FFB6C1,#FF69B4);
-    color:white;font-size:16px;font-weight:700;
-    margin-bottom:10px;cursor:pointer;font-family:inherit;
-    box-shadow:0 4px 14px rgba(255,105,180,0.35);
-    transition:transform 0.15s, box-shadow 0.15s;
-    will-change:transform;
+  /* ============ CHAT ============ */
+  .chat-container{
+    display:flex;flex-direction:column;
+    height:calc(100vh - 140px);
+    max-height:600px;
   }
-  button.main-btn:active{
-    transform:scale(0.96);
-    box-shadow:0 2px 8px rgba(255,105,180,0.35);
+  .chat-header{
+    display:flex;align-items:center;gap:10px;
+    padding:12px 16px;
+    background:var(--card);
+    backdrop-filter:blur(10px);
+    border-radius:20px 20px 0 0;
+    border:2px solid var(--card-border);
+    border-bottom:none;
+    font-weight:700;
+    color:var(--primary-dark);
   }
-
-  /* === Modal === */
-  .modal{
-    display:none;position:fixed;top:0;left:0;
-    width:100%;height:100%;background:rgba(255,182,193,0.6);
-    backdrop-filter:blur(6px);
-    justify-content:center;align-items:center;z-index:100;
-    padding:20px;
+  .chat-header .chat-back{
+    width:32px;height:32px;border-radius:50%;
+    background:var(--bg1);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:16px;
+    border:1px solid var(--primary-light);
   }
-  .modal.show{display:flex;}
-  .modal-content{
-    background:white;border-radius:26px;padding:24px;
-    width:100%;max-width:360px;text-align:center;
-    box-shadow:0 20px 50px rgba(255,105,180,0.4);
-    animation:popIn 0.25s ease-out;
-    max-height:85vh;overflow-y:auto;
+  .chat-messages{
+    flex:1;overflow-y:auto;
+    padding:16px;
+    background:var(--bg1);
+    border-left:2px solid var(--card-border);
+    border-right:2px solid var(--card-border);
+    display:flex;flex-direction:column;gap:8px;
+    -webkit-overflow-scrolling:touch;
   }
-  @keyframes popIn{0%{transform:scale(0.85);opacity:0}100%{transform:scale(1);opacity:1}}
-  .modal-content h3{color:#FF1493;margin-bottom:14px;font-size:20px;}
-  .modal-content input,.modal-content select{
-    width:100%;padding:13px;border:2px solid #FFE4EC;
-    border-radius:15px;font-size:15px;margin:6px 0;
-    text-align:center;font-family:inherit;
-    background:#FFF5F8;color:#C71585;
+  .chat-messages::-webkit-scrollbar{width:4px;}
+  .chat-messages::-webkit-scrollbar-thumb{background:var(--primary-light);border-radius:2px;}
+  .msg{
+    max-width:78%;
+    padding:10px 14px;
+    border-radius:18px;
+    font-size:14px;
+    line-height:1.4;
+    word-wrap:break-word;
+    position:relative;
+    animation:msgIn 0.25s ease-out;
+    font-weight:500;
+  }
+  @keyframes msgIn{
+    from{opacity:0;transform:translateY(8px) scale(0.95)}
+    to{opacity:1;transform:translateY(0) scale(1)}
+  }
+  .msg.me{
+    align-self:flex-end;
+    background:linear-gradient(135deg,var(--primary-light),var(--primary));
+    color:white;
+    border-bottom-right-radius:4px;
+    box-shadow:0 2px 8px var(--shadow);
+  }
+  .msg.them{
+    align-self:flex-start;
+    background:var(--card);
+    color:var(--text);
+    border:1px solid var(--primary-light);
+    border-bottom-left-radius:4px;
+  }
+  .msg .msg-meta{
+    font-size:10px;
+    opacity:0.75;
+    margin-top:3px;
+    display:block;
+    font-weight:400;
+  }
+  .msg .msg-emoji{font-size:18px;margin-right:4px;vertical-align:middle;}
+  .chat-input-bar{
+    display:flex;gap:8px;
+    padding:12px;
+    background:var(--card);
+    backdrop-filter:blur(10px);
+    border-radius:0 0 20px 20px;
+    border:2px solid var(--card-border);
+    border-top:none;
+    align-items:center;
+  }
+  .chat-input-bar input{
+    flex:1;padding:11px 16px;
+    border:2px solid var(--primary-light);
+    border-radius:20px;
+    font-size:14px;font-family:inherit;
+    background:var(--bg1);color:var(--text);
+    outline:none;
     transition:border-color 0.2s;
   }
-  .modal-content input:focus,.modal-content select:focus{
-    outline:none;border-color:#FF69B4;
+  .chat-input-bar input:focus{border-color:var(--primary);}
+  .chat-input-bar input::placeholder{color:var(--text-light);opacity:0.7;}
+  .chat-send{
+    width:42px;height:42px;border-radius:50%;
+    background:linear-gradient(135deg,var(--primary-light),var(--primary));
+    color:white;border:none;cursor:pointer;
+    font-size:18px;flex-shrink:0;
+    box-shadow:0 4px 12px var(--shadow);
+    transition:transform 0.15s;
+    display:flex;align-items:center;justify-content:center;
   }
+  .chat-send:active{transform:scale(0.9);}
+  .chat-emoji-picker{
+    display:flex;gap:4px;padding:6px 12px;
+    background:var(--bg1);
+    overflow-x:auto;
+    border-left:2px solid var(--card-border);
+    border-right:2px solid var(--card-border);
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .chat-emoji-picker::-webkit-scrollbar{display:none;}
+  .chat-emoji-picker span{
+    font-size:22px;cursor:pointer;
+    padding:4px 6px;border-radius:10px;
+    transition:transform 0.15s;
+    flex-shrink:0;
+  }
+  .chat-emoji-picker span:active{transform:scale(1.3);background:var(--card);}
 
-  /* === History === */
+  /* ============ MAP ============ */
+  #map{height:200px;border-radius:18px;margin:8px 0;border:2px solid var(--card-border);}
+  .location-info{font-size:12px;background:var(--bg1);padding:8px 12px;border-radius:12px;margin-top:8px;line-height:1.5;color:var(--text);}
+  .location-info b{color:var(--primary-dark);}
+
+  /* ============ HISTORY ============ */
   .history-item{
-    background:linear-gradient(135deg,#FFF0F5,#FFE4EC);
+    background:linear-gradient(135deg,var(--bg1),var(--bg2));
     padding:12px 14px;border-radius:14px;
     margin-bottom:8px;display:flex;justify-content:space-between;
     align-items:center;font-size:14px;font-weight:600;
-    border:1px solid rgba(255,255,255,0.8);
+    border:1px solid var(--card-border);
+    animation:msgIn 0.3s ease-out;
+    color:var(--text);
   }
   .history-item .info{flex:1;text-align:left;}
-  .history-item .time{font-size:11px;color:#FF69B4;font-weight:400;}
+  .history-item .time{font-size:11px;color:var(--text-light);font-weight:400;}
   .history-item .actions{display:flex;gap:5px;}
   .history-item .actions button{
     width:30px;height:30px;padding:0;border-radius:50%;
-    background:rgba(255,255,255,0.9);color:#FF1493;
+    background:var(--card);color:var(--primary-dark);
     font-size:14px;box-shadow:none;border:none;
-    cursor:pointer;
+    cursor:pointer;transition:transform 0.15s;
   }
-  .history-item .fav-btn.active{background:#FFD700;}
+  .history-item .actions button:active{transform:scale(0.85);}
+  .history-item .fav-btn.active{background:#FFD700;color:white;}
 
-  /* === Heart popup (ลดและใช้ GPU) === */
+  /* ============ CHART ============ */
+  .chart{
+    display:flex;align-items:flex-end;justify-content:space-around;
+    height:140px;padding:8px;
+    background:var(--bg1);border-radius:16px;margin:10px 0;
+    gap:4px;
+  }
+  .chart-col{
+    flex:1;display:flex;flex-direction:column;
+    align-items:center;justify-content:flex-end;
+    height:100%;
+  }
+  .bar{
+    width:100%;max-width:32px;
+    border-radius:8px 8px 0 0;
+    background:linear-gradient(180deg,var(--primary-light),var(--primary-dark));
+    transition:height 0.6s ease-out;
+    min-height:4px;
+    will-change:height;
+  }
+
+  /* ============ POPUPS ============ */
   .heart-popup{
-    position:fixed;font-size:32px;pointer-events:none;z-index:999;
+    position:fixed;font-size:30px;pointer-events:none;z-index:999;
     will-change:transform,opacity;
     animation:heartFly 1.2s ease-out forwards;
   }
@@ -281,8 +547,6 @@
     0%{transform:translate3d(0,0,0) scale(0.6);opacity:1}
     100%{transform:translate3d(0,-200px,0) scale(1.3);opacity:0}
   }
-
-  /* === Confetti (ลด) === */
   .confetti{
     position:fixed;width:8px;height:8px;pointer-events:none;z-index:998;
     will-change:transform,opacity;
@@ -293,76 +557,167 @@
     100%{transform:translate3d(0,110vh,0) rotate(540deg);opacity:0}
   }
 
-  /* === Toast === */
+  /* ============ TOAST ============ */
   .toast{
     position:fixed;top:20px;left:50%;transform:translateX(-50%);
-    background:rgba(255,255,255,0.96);
+    background:var(--card);
+    backdrop-filter:blur(10px);
     padding:10px 18px;border-radius:18px;
-    box-shadow:0 6px 20px rgba(255,105,180,0.4);
-    color:#FF1493;font-weight:700;z-index:9999;
+    box-shadow:0 6px 20px var(--shadow);
+    color:var(--primary-dark);font-weight:700;z-index:9999;
     font-family:inherit;font-size:14px;
     animation:toastIn 0.3s ease-out;
     max-width:90vw;text-align:center;
+    border:2px solid var(--card-border);
   }
   @keyframes toastIn{0%{transform:translate(-50%,-20px);opacity:0}100%{transform:translate(-50%,0);opacity:1}}
 
-  /* === Chart === */
-  .chart{display:flex;align-items:flex-end;justify-content:space-around;height:120px;padding:8px;background:rgba(255,240,245,0.5);border-radius:16px;margin:10px 0;}
-  .bar{width:26px;border-radius:8px 8px 0 0;background:linear-gradient(180deg,#FFB6C1,#FF1493);transition:height 0.6s ease-out;position:relative;min-height:4px;}
-  .bar-label{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:#C71585;font-weight:600;}
-
-  /* === Chat === */
-  .chat-msg{
-    background:#FFF0F5;padding:10px 14px;border-radius:14px;
-    margin-bottom:8px;text-align:left;
-    border:1px solid rgba(255,255,255,0.9);
-    font-size:14px;
+  /* ============ MODAL ============ */
+  .modal{
+    display:none;position:fixed;top:0;left:0;
+    width:100%;height:100%;
+    background:rgba(0,0,0,0.4);
+    backdrop-filter:blur(6px);
+    justify-content:center;align-items:center;z-index:300;
+    padding:20px;
   }
-  .chat-msg .chat-meta{font-size:10px;color:#FF69B4;margin-top:4px;}
+  .modal.show{display:flex;}
+  .modal-content{
+    background:var(--card);
+    backdrop-filter:blur(20px);
+    border-radius:26px;padding:24px;
+    width:100%;max-width:360px;text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,0.3);
+    animation:popIn 0.25s ease-out;
+    max-height:85vh;overflow-y:auto;
+    border:2px solid var(--card-border);
+  }
+  @keyframes popIn{0%{transform:scale(0.85);opacity:0}100%{transform:scale(1);opacity:1}}
+  .modal-content h3{color:var(--primary-dark);margin-bottom:14px;font-size:20px;}
+  .modal-content .label{font-size:13px;color:var(--text-light);font-weight:600;text-align:left;padding-left:4px;margin-top:10px;}
+  .modal-content input,.modal-content select{
+    width:100%;padding:13px;border:2px solid var(--primary-light);
+    border-radius:15px;font-size:15px;margin:6px 0;
+    text-align:center;font-family:inherit;
+    background:var(--bg1);color:var(--text);
+    transition:border-color 0.2s;
+    outline:none;
+  }
+  .modal-content input:focus,.modal-content select:focus{
+    border-color:var(--primary);
+  }
 
-  /* === Loading === */
-  .loading{text-align:center;padding:40px;font-size:20px;color:#FF69B4;}
+  /* ============ THEME PICKER ============ */
+  .theme-picker{
+    display:grid;grid-template-columns:repeat(3,1fr);
+    gap:10px;margin:10px 0;
+  }
+  .theme-card{
+    border-radius:16px;
+    padding:10px 4px;
+    cursor:pointer;
+    border:3px solid transparent;
+    text-align:center;
+    font-size:11px;
+    font-weight:700;
+    transition:transform 0.2s,border-color 0.2s;
+    color:var(--text);
+  }
+  .theme-card:active{transform:scale(0.95);}
+  .theme-card.active{border-color:var(--primary-dark);}
+  .theme-swatch{
+    width:100%;height:34px;border-radius:10px;
+    margin-bottom:6px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.5);
+  }
+  .theme-sakura{background:linear-gradient(135deg,#FFF0F5,#FF85A2);}
+  .theme-peach{background:linear-gradient(135deg,#FFF5EC,#FFB07C);}
+  .theme-mint{background:linear-gradient(135deg,#EEFFF5,#7DD8A8);}
+  .theme-sky{background:linear-gradient(135deg,#EEF8FF,#7EC8E3);}
+  .theme-lavender{background:linear-gradient(135deg,#F5EEFF,#C8A8E9);}
+  .theme-midnight{background:linear-gradient(135deg,#1A1020,#FF69B4);}
 
-  /* === Theme picker === */
-  .theme-picker{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:8px 0;}
-  .theme-dot{width:38px;height:38px;border-radius:50%;cursor:pointer;border:3px solid white;box-shadow:0 3px 8px rgba(0,0,0,0.15);transition:transform 0.2s;}
-  .theme-dot:active{transform:scale(1.15);}
-  .theme-dot.pink{background:linear-gradient(135deg,#FFB6C1,#FF69B4);}
-  .theme-dot.blue{background:linear-gradient(135deg,#87CEEB,#4682B4);}
-  .theme-dot.purple{background:linear-gradient(135deg,#DDA0DD,#9370DB);}
-  .theme-dot.mint{background:linear-gradient(135deg,#98FB98,#3CB371);}
-  .theme-dot.peach{background:linear-gradient(135deg,#FFB07C,#FF8C42);}
-  .theme-dot.dark{background:linear-gradient(135deg,#4D3055,#2A1A2E);}
-  .font-btn{padding:8px 16px;border-radius:12px;border:2px solid #FFE4EC;background:white;color:#FF1493;cursor:pointer;font-size:13px;font-family:inherit;}
+  /* ============ FONT PICKER ============ */
+  .font-picker{
+    display:grid;grid-template-columns:1fr 1fr;
+    gap:8px;margin:10px 0;
+  }
+  .font-btn{
+    padding:10px 8px;
+    border-radius:14px;
+    border:2px solid var(--primary-light);
+    background:var(--bg1);color:var(--text);
+    cursor:pointer;font-size:14px;
+    transition:transform 0.15s,background 0.2s;
+    font-weight:600;
+  }
+  .font-btn:active{transform:scale(0.95);}
+  .font-btn.active{background:var(--primary);color:white;border-color:var(--primary-dark);}
+
+  /* ============ LOADING ============ */
+  .loading{
+    text-align:center;padding:40px;
+    font-size:18px;color:var(--primary);
+    animation:pulse 1.5s infinite;
+  }
+
+  /* ============ CHAT FAB ============ */
+  .chat-fab{
+    position:fixed;bottom:20px;right:20px;
+    width:56px;height:56px;border-radius:50%;
+    background:linear-gradient(135deg,var(--primary-light),var(--primary-dark));
+    color:white;
+    display:flex;align-items:center;justify-content:center;
+    font-size:26px;cursor:pointer;
+    box-shadow:0 6px 20px var(--shadow);
+    z-index:100;
+    transition:transform 0.2s;
+  }
+  .chat-fab:active{transform:scale(0.9);}
+  .chat-fab .badge{
+    position:absolute;top:-2px;right:-2px;
+    background:#FF1493;color:white;
+    font-size:11px;font-weight:700;
+    min-width:22px;height:22px;
+    border-radius:11px;
+    display:flex;align-items:center;justify-content:center;
+    padding:0 6px;
+    border:2px solid white;
+    font-family:sans-serif;
+  }
 </style>
 </head>
-<body>
+<body data-theme="sakura">
 <div class="bg-hearts" id="bgHearts"></div>
+
 <div class="container">
   <!-- Top Bar -->
   <div class="top-bar">
     <div class="avatar" id="avatar" onclick="openSettings()">🧸</div>
     <div class="top-icons">
       <div class="icon-btn" id="muteBtn" onclick="toggleMute()">🔔</div>
-      <div class="icon-btn" onclick="openSettings()">⚙️</div>
+      <div class="icon-btn" onclick="openChatFull()">💬<span class="badge" id="chatBadge" style="display:none;">0</span></div>
+      <div class="icon-btn" onclick="openMenu()">☰</div>
     </div>
   </div>
+
+  <!-- Header -->
   <div class="header">🧸 กระเป๋าหนูเอง 🐰</div>
 
-  <!-- TIME COUNTER -->
+  <!-- Time Counter -->
   <div class="time-counter">
-    💕 คบกันมาแล้ว
+    <div class="time-label">💕 คบกันมาแล้ว</div>
     <div class="time-display">
-      <span id="tDay">0</span> วัน
-      <span id="tHour">0</span> ชม.
-      <span id="tMin">0</span> นาที
-      <span id="tSec">0</span> วิ
+      <span id="tDay">0</span>
+      <span id="tHour">00</span>
+      <span id="tMin">00</span>
+      <span id="tSec">00</span>
     </div>
   </div>
 
   <div id="mainContent" style="display:none;">
 
-    <!-- ===== MONEY ZONE (บนสุด) ===== -->
+    <!-- MONEY ZONE -->
     <div class="zone-label">💰 เงินของฉัน</div>
     <div class="money-zone" id="mainCard">
       <div class="label">เหลือวันนี้</div>
@@ -370,10 +725,25 @@
       <div class="label">บาท</div>
       <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
       <div class="stats">วันนี้ใช้ไป <b id="todayTotal">0</b> บาท · เป้า <b id="dailyBudget">100</b> บาท</div>
+
+      <div class="money-actions">
+        <button class="main-btn" onclick="openAdd()">🍰 เพิ่มรายจ่าย</button>
+        <button class="main-btn ghost" onclick="toggleHistory()">📜 ประวัติ</button>
+      </div>
+      <div class="money-actions">
+        <button class="main-btn ghost" onclick="toggleChart()">📊 กราฟ 7 วัน</button>
+        <button class="main-btn ghost" onclick="openChatFull()">💬 แชท</button>
+      </div>
     </div>
 
-    <!-- ===== PET ZONE ===== -->
-    <div class="zone-label">🐶 สัตว์เลี้ยง</div>
+    <!-- QUICK BUTTONS -->
+    <div class="zone-label">⚡ ใช้บ่อย</div>
+    <div class="zone" style="padding:14px;">
+      <div id="quickGrid"></div>
+    </div>
+
+    <!-- PET ZONE -->
+    <div class="zone-label">🐶 หมาของฉัน</div>
     <div class="zone" style="text-align:center;">
       <div class="pet-name">🐶 โบโบ้</div>
       <div class="pet-level" id="petLevel">Lv.1 ✨ 0/100</div>
@@ -396,35 +766,55 @@
       </div>
     </div>
 
-    <!-- ===== MAP ZONE ===== -->
-    <div class="zone-label">📍 ตำแหน่งแฟน</div>
-    <div class="zone">
-      <div id="map"></div>
-      <div class="location-info" id="locationInfo">📍 ยังไม่มีตำแหน่ง</div>
-      <button class="main-btn" onclick="updateLocation()" style="margin-top:10px;">📍 อัปเดตตำแหน่ง</button>
-    </div>
-
-    <!-- ===== QUICK BUTTONS ===== -->
-    <div class="zone-label">⚡ ใช้บ่อย</div>
-    <div class="zone" style="padding:14px;">
-      <div id="quickGrid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;"></div>
-    </div>
-
-    <!-- ===== MAIN BUTTONS ===== -->
-    <button class="main-btn" onclick="openAdd()">🍰 เพิ่มรายจ่าย</button>
-    <button class="main-btn" onclick="toggleHistory()">📜 ดูย้อนหลัง</button>
-    <button class="main-btn" onclick="toggleChart()">📊 ดูกราฟ 7 วัน</button>
-    <button class="main-btn" onclick="openChat()">💌 กล่องข้อความ</button>
-
-    <div id="historyBox" style="display:none;margin-top:12px;"></div>
-    <div id="chartBox" style="display:none;margin-top:12px;"></div>
-    <div id="chatBox" style="display:none;margin-top:12px;"></div>
+    <!-- HIDDEN BOXES -->
+    <div id="historyBox" style="display:none;"></div>
+    <div id="chartBox" style="display:none;"></div>
   </div>
 
   <div class="loading" id="loadingBox">💕 กำลังโหลดน้า...</div>
 </div>
 
-<!-- Modal Add -->
+<!-- CHAT FAB -->
+<div class="chat-fab" onclick="openChatFull()" id="chatFab" style="display:none;">
+  💬<span class="badge" id="chatFabBadge" style="display:none;">0</span>
+</div>
+
+<!-- SIDE MENU -->
+<div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
+<div class="side-menu" id="sideMenu">
+  <div class="menu-header">🌸 เมนู</div>
+  <div class="menu-item" onclick="openChatFull();closeMenu();">
+    <span class="mi-icon">💬</span> แชทกับที่รัก
+  </div>
+  <div class="menu-item" onclick="openChartMenu();closeMenu();">
+    <span class="mi-icon">📊</span> กราฟ 7 วัน
+  </div>
+  <div class="menu-item" onclick="openMapMenu();closeMenu();">
+    <span class="mi-icon">📍</span> แผนที่ตำแหน่ง
+  </div>
+  <div class="menu-item" onclick="openSettings();closeMenu();">
+    <span class="mi-icon">⚙️</span> ตั้งค่าแอพ
+  </div>
+</div>
+
+<!-- CHAT MODAL -->
+<div class="modal" id="chatModal">
+  <div class="chat-container" style="width:100%;max-width:440px;">
+    <div class="chat-header">
+      <div class="chat-back" onclick="closeChatFull()">←</div>
+      <div style="font-size:22px;">💕</div>
+      <div style="flex:1;">แชทกับที่รัก</div>
+    </div>
+    <div class="chat-emoji-picker" id="chatEmojiPicker"></div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-bar">
+      <input type="text" id="chatInput" placeholder="พิมพ์ข้อความ..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" onclick="sendChat()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ADD -->
 <div class="modal" id="addModal">
   <div class="modal-content">
     <h3>🍰 จ่ายอะไรไปน้า</h3>
@@ -440,29 +830,54 @@
       <option value="✨ อื่นๆ">✨ อื่นๆ</option>
     </select>
     <button class="main-btn" onclick="saveExpense()">💕 บันทึก</button>
-    <button class="main-btn" onclick="closeAdd()" style="background:linear-gradient(135deg,#FFD1DC,#FFC0CB);">ยกเลิก</button>
+    <button class="main-btn ghost" onclick="closeAdd()">ยกเลิก</button>
   </div>
 </div>
 
-<!-- Modal Settings -->
+<!-- MODAL SETTINGS -->
 <div class="modal" id="settingsModal">
   <div class="modal-content">
     <h3>⚙️ ตั้งค่า</h3>
-    <div class="label" style="color:#FF69B4;font-weight:600;font-size:14px;">🎨 ธีมสี</div>
-    <div class="theme-picker">
-      <div class="theme-dot pink" onclick="setTheme('pink')"></div>
-      <div class="theme-dot blue" onclick="setTheme('blue')"></div>
-      <div class="theme-dot purple" onclick="setTheme('purple')"></div>
-      <div class="theme-dot mint" onclick="setTheme('mint')"></div>
-      <div class="theme-dot peach" onclick="setTheme('peach')"></div>
-      <div class="theme-dot dark" onclick="setTheme('dark')"></div>
+
+    <div class="label">🎨 ธีม</div>
+    <div class="theme-picker" id="themePicker">
+      <div class="theme-card" data-theme="sakura" onclick="setTheme('sakura')"><div class="theme-swatch theme-sakura"></div>ซากุระ</div>
+      <div class="theme-card" data-theme="peach" onclick="setTheme('peach')"><div class="theme-swatch theme-peach"></div>พีช</div>
+      <div class="theme-card" data-theme="mint" onclick="setTheme('mint')"><div class="theme-swatch theme-mint"></div>มินต์</div>
+      <div class="theme-card" data-theme="sky" onclick="setTheme('sky')"><div class="theme-swatch theme-sky"></div>ท้องฟ้า</div>
+      <div class="theme-card" data-theme="lavender" onclick="setTheme('lavender')"><div class="theme-swatch theme-lavender"></div>ลาเวนเดอร์</div>
+      <div class="theme-card" data-theme="midnight" onclick="setTheme('midnight')"><div class="theme-swatch theme-midnight"></div>มืด</div>
     </div>
-    <div class="label" style="color:#FF69B4;font-weight:600;font-size:14px;margin-top:12px;">💰 งบต่อวัน</div>
+
+    <div class="label">✍️ ฟอนต์</div>
+    <div class="font-picker" id="fontPicker">
+      <button class="font-btn" data-font="Mali" onclick="setFont('Mali',event)">Mali นุ่มนิ่ม</button>
+      <button class="font-btn" data-font="Itim" onclick="setFont('Itim',event)">Itim น่ารัก</button>
+      <button class="font-btn" data-font="Prompt" onclick="setFont('Prompt',event)">Prompt ทันสมัย</button>
+      <button class="font-btn" data-font="Kanit" onclick="setFont('Kanit',event)">Kanit คมชัด</button>
+      <button class="font-btn" data-font="Sarabun" onclick="setFont('Sarabun',event)">Sarabun อ่านง่าย</button>
+      <button class="font-btn" data-font="Chakra Petch" onclick="setFont('Chakra Petch',event)">Chakra เพรียว</button>
+    </div>
+
+    <div class="label">💰 งบต่อวัน (บาท)</div>
     <input type="number" id="budgetInput" placeholder="เช่น 100">
-    <div class="label" style="color:#FF69B4;font-weight:600;font-size:14px;margin-top:12px;">🖼️ รูปโปรไฟล์</div>
+
+    <div class="label">🖼️ รูปโปรไฟล์ (emoji)</div>
     <input type="text" id="avatarInput" placeholder="เช่น 🐰" maxlength="2">
+
     <button class="main-btn" onclick="saveSettings()">💾 บันทึก</button>
-    <button class="main-btn" onclick="closeSettings()" style="background:linear-gradient(135deg,#FFD1DC,#FFC0CB);">ปิด</button>
+    <button class="main-btn ghost" onclick="closeSettings()">ปิด</button>
+  </div>
+</div>
+
+<!-- MODAL MAP -->
+<div class="modal" id="mapModal">
+  <div class="modal-content" style="max-width:440px;">
+    <h3>📍 ตำแหน่ง</h3>
+    <div id="map"></div>
+    <div class="location-info" id="locationInfo">📍 ยังไม่มีตำแหน่ง</div>
+    <button class="main-btn" onclick="updateLocation()" style="margin-top:10px;">📍 อัปเดตตำแหน่ง</button>
+    <button class="main-btn ghost" onclick="closeMapMenu()">ปิด</button>
   </div>
 </div>
 
@@ -470,21 +885,36 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+/* ============================================================
+   FIREBASE
+============================================================ */
 const firebaseConfig = { databaseURL: "https://lovewallet-71a77-default-rtdb.asia-southeast1.firebasedatabase.app" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ====== STATE ======
-let allExpenses = [];      // ทั้งหมด (สำหรับกราฟ)
-let monthExpenses = [];    // เฉพาะเดือนนี้
+/* ============================================================
+   STATE
+============================================================ */
+let allExpenses = [];
+let monthExpenses = [];
 let todayTotal = 0;
 let dailyBudget = 100;
 let muted = false;
 let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
 let pet = { hunger: 100, happy: 100, level: 1, exp: 0 };
 let map, marker;
+let currentTheme = localStorage.getItem('theme') || 'sakura';
+let currentFont = localStorage.getItem('font') || 'Mali';
+let chatListener = null;
+let chatOpen = false;
+let lastSeenMsgTs = parseInt(localStorage.getItem('lastSeenMsgTs') || '0');
+let unreadCount = 0;
+let currentUserId = localStorage.getItem('userId') || ('u_' + Date.now());
+localStorage.setItem('userId', currentUserId);
 
-// ====== ANNIVERSARY (24/8/66 เวลา 00:00 ไทย) ======
+/* ============================================================
+   ANNIVERSARY
+============================================================ */
 const START_TIME = new Date('2023-08-24T00:00:00+07:00').getTime();
 function updateTimer() {
   const diff = Date.now() - START_TIME;
@@ -493,51 +923,96 @@ function updateTimer() {
   const h = Math.floor((diff % 86400000) / 3600000);
   const m = Math.floor((diff % 3600000) / 60000);
   const s = Math.floor((diff % 60000) / 1000);
-  document.getElementById('tDay').textContent = d;
-  document.getElementById('tHour').textContent = String(h).padStart(2,'0');
-  document.getElementById('tMin').textContent = String(m).padStart(2,'0');
-  document.getElementById('tSec').textContent = String(s).padStart(2,'0');
+  const dayEl = document.getElementById('tDay');
+  const hourEl = document.getElementById('tHour');
+  const minEl = document.getElementById('tMin');
+  const secEl = document.getElementById('tSec');
+  if (dayEl) dayEl.textContent = d;
+  if (hourEl) hourEl.textContent = String(h).padStart(2,'0');
+  if (minEl) minEl.textContent = String(m).padStart(2,'0');
+  if (secEl) {
+    secEl.textContent = String(s).padStart(2,'0');
+    secEl.classList.remove('tick');
+    void secEl.offsetWidth;
+    secEl.classList.add('tick');
+  }
 }
 updateTimer();
 setInterval(updateTimer, 1000);
 
-// ====== BG hearts (ลดจำนวน) ======
+/* ============================================================
+   BG HEARTS (ตามธีม)
+============================================================ */
 function createBgHearts() {
   const box = document.getElementById('bgHearts');
-  const arr = ['💕','💖','🎀','🌸','✨','💝','🐻','🐰'];
+  box.innerHTML = '';
+  const themeEmojis = {
+    sakura: ['🌸','💕','💖','🎀','✨'],
+    peach: ['🍑','🧡','💛','✨','🌼'],
+    mint: ['🌿','💚','🍃','✨','🌸'],
+    sky: ['☁️','💙','🩵','✨','🌊'],
+    lavender: ['💜','🦄','✨','💫','🌸'],
+    midnight: ['⭐','🌙','✨','💫','🌟']
+  };
+  const arr = themeEmojis[currentTheme] || themeEmojis.sakura;
   for (let i = 0; i < 8; i++) {
     const h = document.createElement('span');
     h.textContent = arr[i % arr.length];
-    h.style.left = (i * 12 + 5) + '%';
+    h.style.left = (i * 12 + 4) + '%';
     h.style.animationDelay = (i * 1.5) + 's';
-    h.style.animationDuration = (12 + (i % 4) * 2) + 's';
+    h.style.animationDuration = (14 + (i % 4) * 2) + 's';
     box.appendChild(h);
   }
 }
-createBgHearts();
 
-// ====== UI ======
-function updateUI() {
-  const remain = Math.max(0, dailyBudget - todayTotal);
-  const el = document.getElementById('remain');
-  el.textContent = remain;
-  document.getElementById('todayTotal').textContent = todayTotal;
-  document.getElementById('dailyBudget').textContent = dailyBudget;
-  document.getElementById('progress').style.width = Math.min(100, (todayTotal / dailyBudget) * 100) + '%';
-  el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
+/* ============================================================
+   THEME + FONT
+============================================================ */
+function setTheme(t) {
+  haptic();
+  currentTheme = t;
+  document.body.dataset.theme = t;
+  localStorage.setItem('theme', t);
+  createBgHearts();
+  // อัปเดต active
+  document.querySelectorAll('.theme-card').forEach(el => {
+    el.classList.toggle('active', el.dataset.theme === t);
+  });
+  // บันทึก Firebase
+  db.ref('settings/theme').set(t).catch(()=>{});
 }
 
-function updatePetUI() {
-  document.getElementById('hungerBar').style.width = pet.hunger + '%';
-  document.getElementById('happyBar').style.width = pet.happy + '%';
-  const expMax = pet.level * 100;
-  document.getElementById('expBar').style.width = ((pet.exp % expMax) / expMax * 100) + '%';
-  document.getElementById('petLevel').textContent = 'Lv.' + pet.level + ' ✨ ' + (pet.exp % expMax) + '/' + expMax;
-  const dog = document.getElementById('dog');
-  dog.textContent = pet.happy < 30 ? '😢' : pet.hunger < 30 ? '🐕' : '🐶';
+function setFont(f, evt) {
+  haptic();
+  currentFont = f;
+  document.documentElement.style.setProperty('--font', `'${f}',cursive`);
+  document.body.style.fontFamily = `'${f}',cursive`;
+  localStorage.setItem('font', f);
+  document.querySelectorAll('.font-btn').forEach(el => {
+    el.classList.toggle('active', el.dataset.font === f);
+  });
+  if (evt && evt.currentTarget) {
+    document.querySelectorAll('.font-btn').forEach(el => el.classList.remove('active'));
+    evt.currentTarget.classList.add('active');
+  }
+  db.ref('settings/font').set(f).catch(()=>{});
 }
 
-// ====== TOAST ======
+function applyTheme() {
+  document.body.dataset.theme = currentTheme;
+  document.documentElement.style.setProperty('--font', `'${currentFont}',cursive`);
+  document.body.style.fontFamily = `'${currentFont}',cursive`;
+  document.querySelectorAll('.theme-card').forEach(el => {
+    el.classList.toggle('active', el.dataset.theme === currentTheme);
+  });
+  document.querySelectorAll('.font-btn').forEach(el => {
+    el.classList.toggle('active', el.dataset.font === currentFont);
+  });
+}
+
+/* ============================================================
+   UTILS
+============================================================ */
 let toastTimer;
 function showToast(msg) {
   const old = document.querySelector('.toast');
@@ -549,20 +1024,46 @@ function showToast(msg) {
   document.body.appendChild(t);
   toastTimer = setTimeout(() => t.remove(), 2000);
 }
-
 function haptic(ms = 20) { if (navigator.vibrate) navigator.vibrate(ms); }
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+let lastActionTime = 0;
+function throttle(ms = 350) {
+  const now = Date.now();
+  if (now - lastActionTime < ms) return false;
+  lastActionTime = now;
+  return true;
+}
 
-// ====== PET ======
-function savePet() { db.ref('pet').set({ ...pet, updatedAt: Date.now() }); }
+/* ============================================================
+   PET
+============================================================ */
+function savePet() { db.ref('pet').set({ ...pet, updatedAt: Date.now() }).catch(()=>{}); }
 function loadPet() {
   db.ref('pet').once('value').then(snap => {
     const p = snap.val();
     if (p) pet = { hunger: p.hunger ?? 100, happy: p.happy ?? 100, level: p.level ?? 1, exp: p.exp ?? 0 };
     else savePet();
     updatePetUI();
-  });
+  }).catch(()=>{});
 }
-
+function updatePetUI() {
+  const hb = document.getElementById('hungerBar');
+  const hp = document.getElementById('happyBar');
+  const eb = document.getElementById('expBar');
+  if (!hb) return;
+  hb.style.width = pet.hunger + '%';
+  hp.style.width = pet.happy + '%';
+  const expMax = pet.level * 100;
+  const expNow = pet.exp % expMax;
+  eb.style.width = (expNow / expMax * 100) + '%';
+  document.getElementById('petLevel').textContent = 'Lv.' + pet.level + ' ✨ ' + expNow + '/' + expMax;
+  const dog = document.getElementById('dog');
+  if (!dog) return;
+  dog.textContent = pet.happy < 30 ? '😢' : pet.hunger < 30 ? '🐕' : '🐶';
+}
 function addExp(amount) {
   pet.exp += amount;
   const expMax = pet.level * 100;
@@ -573,15 +1074,6 @@ function addExp(amount) {
   }
   savePet(); updatePetUI();
 }
-
-let lastActionTime = 0;
-function throttle() {
-  const now = Date.now();
-  if (now - lastActionTime < 400) return false;
-  lastActionTime = now;
-  return true;
-}
-
 function petDog() {
   if (!throttle()) return;
   haptic();
@@ -591,10 +1083,9 @@ function petDog() {
   addExp(3);
   createHeartPopup();
   updatePetUI();
-  const msgs = ['โบโบ้รักเธอจัง 🥰','โบโบ้หาง wag wag 🐕','โบโบ้อ้อน 💗','โบโบ้ยิ้มแล้ว ✨'];
+  const msgs = ['โบโบ้รักเธอจัง 🥰','โบโบ้หาง wag wag 🐕','โบโบ้อ้อน 💗','โบโบ้ยิ้มแล้ว ✨','โบโบ้ดีใจ 🐶'];
   showToast(msgs[Math.floor(Math.random() * msgs.length)]);
 }
-
 function feedDog() {
   if (!throttle()) return;
   haptic();
@@ -606,7 +1097,6 @@ function feedDog() {
   updatePetUI();
   showToast('🍖 โบโบ้อิ่มแล้วน้า!');
 }
-
 function playDog() {
   if (!throttle()) return;
   haptic();
@@ -619,72 +1109,82 @@ function playDog() {
   updatePetUI();
   showToast('🎾 โบโบ้เล่นสนุกมาก!');
 }
-
-// ลดลงทุก 10 นาที (เบาลง)
 setInterval(() => {
   pet.hunger = Math.max(0, pet.hunger - 1);
   pet.happy = Math.max(0, pet.happy - 1);
   savePet(); updatePetUI();
 }, 10 * 60 * 1000);
 
-// ====== MAP ======
-function initMap() {
-  if (map) return;
-  map = L.map('map', { zoomControl: true, attributionControl: false }).setView([13.7563, 100.5018], 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-  const dogIcon = L.divIcon({ html: '<div style="font-size:30px;text-align:center;">🐶</div>', className: '', iconSize: [40, 40], iconAnchor: [20, 40] });
-  marker = L.marker([13.7563, 100.5018], { icon: dogIcon }).addTo(map);
-  db.ref('location').on('value', snap => {
-    const loc = snap.val();
-    if (loc && loc.lat) {
-      map.setView([loc.lat, loc.lng], 16);
-      marker.setLatLng([loc.lat, loc.lng]);
-      document.getElementById('locationInfo').innerHTML = '📍 <b>ล่าสุด</b><br>ละติจูด: ' + loc.lat.toFixed(5) + '<br>ลองจิจูด: ' + loc.lng.toFixed(5) + '<br>อัปเดต: ' + loc.time;
-    }
-  });
+/* ============================================================
+   EFFECTS
+============================================================ */
+function createHeartPopup() {
+  const x = window.innerWidth / 2;
+  const y = window.innerHeight / 2;
+  const hearts = ['💖','💕','🎀','✨'];
+  for (let i = 0; i < 4; i++) {
+    const h = document.createElement('div');
+    h.className = 'heart-popup';
+    h.textContent = hearts[i];
+    h.style.left = (x - 20 + (Math.random() - 0.5) * 120) + 'px';
+    h.style.top = y + 'px';
+    h.style.animationDelay = (i * 0.08) + 's';
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 1300);
+  }
+}
+function createConfetti() {
+  const colors = ['#FF69B4','#FFB6C1','#FFD700','#87CEEB'];
+  for (let i = 0; i < 12; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + '%';
+    c.style.background = colors[i % colors.length];
+    c.style.animationDelay = Math.random() * 0.3 + 's';
+    if (Math.random() > 0.5) c.style.borderRadius = '50%';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 2000);
+  }
 }
 
-function updateLocation() {
-  if (!navigator.geolocation) { alert('เบราว์เซอร์ไม่รองรับ GPS'); return; }
-  document.getElementById('locationInfo').textContent = '📍 กำลังหาตำแหน่ง...';
-  navigator.geolocation.getCurrentPosition(pos => {
-    const lat = pos.coords.latitude, lng = pos.coords.longitude;
-    const time = new Date().toLocaleString('th-TH');
-    db.ref('location').set({ lat, lng, time, timestamp: Date.now() });
-    showToast('📍 อัปเดตแล้วน้า');
-  }, err => {
-    document.getElementById('locationInfo').textContent = '❌ หาตำแหน่งไม่ได้';
-    showToast('❌ หาตำแหน่งไม่ได้');
-  }, { enableHighAccuracy: true, timeout: 10000 });
+/* ============================================================
+   MONEY
+============================================================ */
+function updateUI() {
+  const remain = Math.max(0, dailyBudget - todayTotal);
+  const el = document.getElementById('remain');
+  if (!el) return;
+  el.textContent = remain;
+  document.getElementById('todayTotal').textContent = todayTotal;
+  document.getElementById('dailyBudget').textContent = dailyBudget;
+  document.getElementById('progress').style.width = Math.min(100, (todayTotal / dailyBudget) * 100) + '%';
+  el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
 }
-
-// ====== FIREBASE ======
 function loadFromFirebase() {
   db.ref('expenses').orderByChild('timestamp').on('value', snapshot => {
     allExpenses = [];
     snapshot.forEach(child => { allExpenses.push({ ...child.val(), key: child.key }); });
-
     const now = new Date();
-    const todayKey = now.toISOString().slice(0, 10);
-    const monthKey = now.toISOString().slice(0, 7);
-
+    const todayKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+    const monthKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
     monthExpenses = allExpenses.filter(e => e.date_key === monthKey);
-    todayTotal = allExpenses.filter(e => e.day_key === todayKey).reduce((s, e) => s + e.amount, 0);
+    todayTotal = allExpenses.filter(e => e.day_key === todayKey).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
 
     db.ref('settings').once('value').then(snap => {
       const s = snap.val() || {};
-      if (s.dailyBudget) dailyBudget = s.dailyBudget;
+      if (s.dailyBudget) dailyBudget = parseFloat(s.dailyBudget);
       if (s.avatar) document.getElementById('avatar').textContent = s.avatar;
+      if (s.theme && !localStorage.getItem('theme')) setTheme(s.theme);
+      if (s.font && !localStorage.getItem('font')) setFont(s.font);
       document.getElementById('loadingBox').style.display = 'none';
       document.getElementById('mainContent').style.display = 'block';
+      document.getElementById('chatFab').style.display = 'flex';
       renderQuickButtons();
       updateUI();
       loadPet();
-      if (!map) setTimeout(initMap, 200);
     });
   });
 }
-
 function renderQuickButtons() {
   const grid = document.getElementById('quickGrid');
   const arr = [
@@ -701,7 +1201,6 @@ function renderQuickButtons() {
     grid.appendChild(btn);
   });
 }
-
 function quickAdd(label, amount) {
   haptic();
   const now = new Date();
@@ -709,18 +1208,16 @@ function quickAdd(label, amount) {
     date: now.toLocaleDateString('th-TH'),
     time: now.toLocaleTimeString('th-TH', {hour:'2-digit',minute:'2-digit'}),
     item: label, amount, category: '✨ อื่นๆ',
-    date_key: now.toISOString().slice(0,7),
-    day_key: now.toISOString().slice(0,10),
+    date_key: now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0'),
+    day_key: now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0'),
     timestamp: Date.now()
   };
-  db.ref('expenses/' + rec.timestamp).set(rec);
+  db.ref('expenses/' + rec.timestamp).set(rec).catch(()=>{});
   createHeartPopup();
   createConfetti();
 }
-
 function openAdd() { document.getElementById('addModal').classList.add('show'); haptic(); }
 function closeAdd() { document.getElementById('addModal').classList.remove('show'); }
-
 function saveExpense() {
   const item = document.getElementById('itemInput').value.trim() || 'ไม่ระบุ';
   const amount = parseFloat(document.getElementById('amountInput').value);
@@ -732,70 +1229,41 @@ function saveExpense() {
     date: now.toLocaleDateString('th-TH'),
     time: now.toLocaleTimeString('th-TH', {hour:'2-digit',minute:'2-digit'}),
     item, amount, category,
-    date_key: now.toISOString().slice(0,7),
-    day_key: now.toISOString().slice(0,10),
+    date_key: now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0'),
+    day_key: now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0'),
     timestamp: Date.now()
   };
-  db.ref('expenses/' + rec.timestamp).set(rec);
+  db.ref('expenses/' + rec.timestamp).set(rec).catch(()=>{});
   document.getElementById('itemInput').value = '';
   document.getElementById('amountInput').value = '';
   closeAdd();
   createHeartPopup();
   createConfetti();
   if (todayTotal + amount > dailyBudget) {
-    setTimeout(() => {
-      document.getElementById('mainCard').style.animation = 'none';
-      showToast('🥺 เกินงบแล้วน้า!');
-    }, 300);
+    setTimeout(() => showToast('🥺 เกินงบแล้วน้า!'), 300);
   }
 }
 
-function createHeartPopup() {
-  const x = window.innerWidth / 2;
-  const y = window.innerHeight / 2;
-  const hearts = ['💖','💕','🎀','✨'];
-  for (let i = 0; i < 4; i++) {
-    const h = document.createElement('div');
-    h.className = 'heart-popup';
-    h.textContent = hearts[i];
-    h.style.left = (x - 20 + (Math.random() - 0.5) * 120) + 'px';
-    h.style.top = y + 'px';
-    h.style.animationDelay = (i * 0.08) + 's';
-    document.body.appendChild(h);
-    setTimeout(() => h.remove(), 1300);
-  }
-}
-
-function createConfetti() {
-  const colors = ['#FF69B4','#FFB6C1','#FFD700','#87CEEB'];
-  for (let i = 0; i < 12; i++) {
-    const c = document.createElement('div');
-    c.className = 'confetti';
-    c.style.left = Math.random() * 100 + '%';
-    c.style.background = colors[i % colors.length];
-    c.style.animationDelay = Math.random() * 0.3 + 's';
-    if (Math.random() > 0.5) c.style.borderRadius = '50%';
-    document.body.appendChild(c);
-    setTimeout(() => c.remove(), 2000);
-  }
-}
-
-// ====== HISTORY ======
+/* ============================================================
+   HISTORY
+============================================================ */
 function toggleHistory() {
   haptic();
   const box = document.getElementById('historyBox');
-  if (box.style.display === 'none') {
-    let html = '<div class="zone" style="text-align:left;">';
-    if (monthExpenses.length === 0) html += '<div style="text-align:center;">ยังไม่มีรายการน้า 🐰</div>';
-    else [...monthExpenses].reverse().forEach(e => {
+  if (box.style.display === 'none' || !box.style.display) {
+    let html = '<div class="zone" style="text-align:left;"><div style="font-weight:700;text-align:center;margin-bottom:10px;">📜 ประวัติ</div>';
+    if (monthExpenses.length === 0) html += '<div style="text-align:center;padding:20px;color:var(--text-light);">ยังไม่มีรายการน้า 🐰</div>';
+    else [...monthExpenses].reverse().slice(0, 50).forEach(e => {
       const isFav = favorites.includes(e.key);
-      html += '<div class="history-item"><div class="info"><b>' + e.item + '</b> ' + (e.category || '') + '<br><span class="time">' + e.time + '</span></div><div class="actions"><button class="fav-btn ' + (isFav ? 'active' : '') + '" onclick="toggleFav(\'' + e.key + '\')">⭐</button><button onclick="editItem(\'' + e.key + '\')">✏️</button><button onclick="deleteItem(\'' + e.key + '\')">🗑️</button></div></div>';
+      html += '<div class="history-item"><div class="info"><b>' + escapeHtml(e.item) + '</b> ' + escapeHtml(e.category || '') + '<br><span class="time">' + escapeHtml(e.time) + '</span></div><div class="actions"><button class="fav-btn ' + (isFav ? 'active' : '') + '" onclick="toggleFav(\'' + e.key + '\')">⭐</button><button onclick="editItem(\'' + e.key + '\')">✏️</button><button onclick="deleteItem(\'' + e.key + '\')">🗑️</button></div></div>';
     });
     html += '</div>';
-    box.innerHTML = html; box.style.display = 'block';
+    box.innerHTML = html;
+    box.style.display = 'block';
+    document.getElementById('chartBox').style.display = 'none';
+    box.scrollIntoView({behavior:'smooth', block:'start'});
   } else box.style.display = 'none';
 }
-
 function toggleFav(key) {
   haptic();
   const i = favorites.indexOf(key);
@@ -803,14 +1271,12 @@ function toggleFav(key) {
   localStorage.setItem('favorites', JSON.stringify(favorites));
   toggleHistory(); toggleHistory();
 }
-
 function deleteItem(key) {
   if (!confirm('ลบรายการนี้เลยไหม?')) return;
   haptic();
   db.ref('expenses/' + key).remove();
   toggleHistory(); toggleHistory();
 }
-
 function editItem(key) {
   const item = allExpenses.find(e => e.key === key);
   if (!item) return;
@@ -820,88 +1286,238 @@ function editItem(key) {
   toggleHistory(); toggleHistory();
 }
 
-// ====== CHART (แก้ให้ใช้ allExpenses) ======
-function toggleChart() {
+/* ============================================================
+   CHART
+============================================================ */
+function openChartMenu() {
   haptic();
   const box = document.getElementById('chartBox');
-  if (box.style.display === 'none') {
-    const labels = ['อา','จ','อ','พ','พฤ','ศ','ส'];
-    const days = [];
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-      const total = allExpenses.filter(e => e.day_key === key).reduce((s, e) => s + e.amount, 0);
-      days.push({ label: labels[d.getDay()], total });
-    }
-    const max = Math.max(...days.map(d => d.total), 1);
-    let html = '<div class="zone"><div style="font-weight:700;text-align:center;margin-bottom:10px;">📊 รายจ่าย 7 วัน</div><div class="chart">';
-    days.forEach(d => {
-      const h = Math.max(4, (d.total / max) * 100);
-      html += '<div style="display:flex;flex-direction:column;align-items:center;flex:1;"><div class="bar" style="height:' + h + 'px;"></div><div style="font-size:10px;margin-top:6px;color:#C71585;font-weight:600;">' + d.label + '</div><div style="font-size:9px;color:#FF69B4;">' + d.total + '</div></div>';
-    });
-    html += '</div><div style="text-align:center;font-size:13px;color:#C71585;">รวม ' + days.reduce((s, d) => s + d.total, 0) + ' บาท</div></div>';
-    box.innerHTML = html;
-    box.style.display = 'block';
-  } else box.style.display = 'none';
-}
-
-// ====== CHAT (แก้ให้ใช้ on + fallback) ======
-let chatListenerActive = false;
-function openChat() {
-  haptic();
-  const box = document.getElementById('chatBox');
-  if (box.style.display === 'none') {
-    box.innerHTML = '<div class="zone" style="text-align:center;">💕 กำลังโหลดข้อความ...</div>';
-    box.style.display = 'block';
-    db.ref('messages').orderByChild('timestamp').limitToLast(30).on('value', snap => {
-      const msgs = [];
-      snap.forEach(c => msgs.push(c.val()));
-      let html = '<div class="zone" style="text-align:left;"><div style="font-weight:700;text-align:center;margin-bottom:10px;">💌 ข้อความจากที่รัก</div>';
-      if (msgs.length === 0) {
-        html += '<div style="text-align:center;color:#FF69B4;font-size:14px;">ยังไม่มีข้อความน้า 🐰<br><span style="font-size:12px;">รอที่รักส่งมานะ 💕</span></div>';
-      } else {
-        [...msgs].reverse().forEach(m => {
-          html += '<div class="chat-msg"><b style="font-size:18px;">' + (m.emoji || '💕') + '</b> ' + m.text + '<div class="chat-meta">' + m.time + '</div></div>';
-        });
-      }
-      html += '</div>';
-      box.innerHTML = html;
-    }, err => {
-      box.innerHTML = '<div class="zone" style="text-align:center;">❌ โหลดข้อความไม่ได้<br><span style="font-size:12px;">ลองปิด-เปิดใหม่นะ</span></div>';
-      console.log(err);
-    });
-    chatListenerActive = true;
-  } else {
-    box.style.display = 'none';
-    if (chatListenerActive) {
-      db.ref('messages').off();
-      chatListenerActive = false;
-    }
+  box.style.display = 'block';
+  document.getElementById('historyBox').style.display = 'none';
+  const labels = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    const total = allExpenses.filter(e => e.day_key === key).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+    days.push({ label: labels[d.getDay()], total, date: key });
   }
+  const max = Math.max(...days.map(d => d.total), 1);
+  let html = '<div class="zone"><div style="font-weight:700;text-align:center;margin-bottom:12px;">📊 รายจ่าย 7 วัน</div><div class="chart">';
+  days.forEach(d => {
+    const h = Math.max(4, (d.total / max) * 110);
+    html += '<div class="chart-col"><div style="font-size:9px;color:var(--text-light);margin-bottom:2px;font-weight:700;">' + d.total + '</div><div class="bar" style="height:' + h + 'px;"></div><div style="font-size:10px;margin-top:6px;color:var(--text);font-weight:700;">' + d.label + '</div></div>';
+  });
+  html += '</div><div style="text-align:center;font-size:13px;color:var(--text);font-weight:600;margin-top:6px;">รวม ' + days.reduce((s, d) => s + d.total, 0) + ' บาท</div>';
+  html += '<button class="main-btn ghost" onclick="document.getElementById(\'chartBox\').style.display=\'none\'" style="margin-top:10px;">ปิด</button></div>';
+  box.innerHTML = html;
+  box.scrollIntoView({behavior:'smooth', block:'start'});
+}
+function toggleChart() { openChartMenu(); }
+
+/* ============================================================
+   MAP
+============================================================ */
+function openMapMenu() {
+  haptic();
+  document.getElementById('mapModal').classList.add('show');
+  setTimeout(() => {
+    if (!map) initMap();
+    else map.invalidateSize();
+  }, 200);
+}
+function closeMapMenu() { document.getElementById('mapModal').classList.remove('show'); }
+
+function initMap() {
+  const mapEl = document.getElementById('map');
+  if (!mapEl) return;
+  if (map) { map.remove(); map = null; }
+  map = L.map('map', { attributionControl: false }).setView([13.7563, 100.5018], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+  const dogIcon = L.divIcon({ html: '<div style="font-size:30px;text-align:center;">🐶</div>', className: '', iconSize: [40, 40], iconAnchor: [20, 40] });
+  marker = L.marker([13.7563, 100.5018], { icon: dogIcon }).addTo(map);
+  db.ref('location').on('value', snap => {
+    const loc = snap.val();
+    if (loc && loc.lat) {
+      map.setView([loc.lat, loc.lng], 16);
+      marker.setLatLng([loc.lat, loc.lng]);
+      document.getElementById('locationInfo').innerHTML = '📍 <b>ล่าสุด</b><br>ละติจูด: ' + loc.lat.toFixed(5) + '<br>ลองจิจูด: ' + loc.lng.toFixed(5) + '<br>อัปเดต: ' + escapeHtml(loc.time);
+    }
+  });
+}
+function updateLocation() {
+  if (!navigator.geolocation) { alert('เบราว์เซอร์ไม่รองรับ GPS'); return; }
+  document.getElementById('locationInfo').textContent = '📍 กำลังหาตำแหน่ง...';
+  navigator.geolocation.getCurrentPosition(pos => {
+    const lat = pos.coords.latitude, lng = pos.coords.longitude;
+    const time = new Date().toLocaleString('th-TH');
+    db.ref('location').set({ lat, lng, time, timestamp: Date.now() });
+    showToast('📍 อัปเดตแล้วน้า');
+  }, err => {
+    document.getElementById('locationInfo').textContent = '❌ หาตำแหน่งไม่ได้';
+    showToast('❌ หาตำแหน่งไม่ได้');
+  }, { enableHighAccuracy: true, timeout: 10000 });
 }
 
-// ====== SETTINGS ======
+/* ============================================================
+   CHAT (2-way real-time)
+============================================================ */
+function openChatFull() {
+  haptic();
+  chatOpen = true;
+  document.getElementById('chatModal').classList.add('show');
+  document.getElementById('chatMessages').innerHTML = '<div style="text-align:center;color:var(--text-light);font-size:13px;padding:20px;">💕 กำลังโหลดข้อความ...</div>';
+  
+  // mark as read
+  markChatRead();
+  
+  // เปิด listener
+  if (chatListener) { db.ref('messages').off(); chatListener = null; }
+  chatListener = db.ref('messages').orderByChild('timestamp').limitToLast(100).on('value', snap => {
+    const msgs = [];
+    snap.forEach(c => msgs.push({ ...c.val(), key: c.key }));
+    const chatBox = document.getElementById('chatMessages');
+    if (!chatBox) return;
+    if (msgs.length === 0) {
+      chatBox.innerHTML = '<div style="text-align:center;color:var(--text-light);font-size:13px;padding:30px;">💕 ยังไม่มีข้อความ<br><span style="font-size:11px;">เริ่มพิมพ์เลยน้า</span></div>';
+      return;
+    }
+    let html = '';
+    msgs.forEach(m => {
+      const isMe = m.userId === currentUserId;
+      const timeStr = m.time || '';
+      html += '<div class="msg ' + (isMe ? 'me' : 'them') + '">';
+      if (m.emoji) html += '<span class="msg-emoji">' + escapeHtml(m.emoji) + '</span>';
+      html += escapeHtml(m.text || '');
+      html += '<span class="msg-meta">' + escapeHtml(timeStr) + '</span>';
+      html += '</div>';
+    });
+    chatBox.innerHTML = html;
+    chatBox.scrollTop = chatBox.scrollHeight;
+    // mark read for latest
+    if (msgs.length > 0) {
+      const latest = msgs[msgs.length - 1];
+      if (latest.userId !== currentUserId && latest.timestamp > lastSeenMsgTs) {
+        lastSeenMsgTs = latest.timestamp;
+        localStorage.setItem('lastSeenMsgTs', lastSeenMsgTs);
+        unreadCount = 0;
+        updateChatBadge();
+      }
+    }
+  }, err => {
+    console.log('Chat error:', err);
+    document.getElementById('chatMessages').innerHTML = '<div style="text-align:center;color:var(--text-light);font-size:13px;padding:20px;">❌ โหลดข้อความไม่ได้<br><span style="font-size:11px;">ลองปิด-เปิดใหม่</span></div>';
+  });
+  
+  setTimeout(() => {
+    const inp = document.getElementById('chatInput');
+    if (inp) inp.focus();
+  }, 300);
+}
+function closeChatFull() {
+  chatOpen = false;
+  document.getElementById('chatModal').classList.remove('show');
+  if (chatListener) { db.ref('messages').off(); chatListener = null; }
+  markChatRead();
+}
+function sendChat() {
+  const inp = document.getElementById('chatInput');
+  const text = inp.value.trim();
+  if (!text) return;
+  haptic();
+  const now = new Date();
+  const msg = {
+    text: text,
+    emoji: '',
+    userId: currentUserId,
+    timestamp: Date.now(),
+    time: now.toLocaleTimeString('th-TH', {hour:'2-digit',minute:'2-digit'})
+  };
+  db.ref('messages/' + msg.timestamp).set(msg).then(() => {
+    inp.value = '';
+    lastSeenMsgTs = msg.timestamp;
+    localStorage.setItem('lastSeenMsgTs', lastSeenMsgTs);
+  }).catch(e => {
+    showToast('ส่งไม่ได้ ลองอีกทีนะ 🥺');
+    console.log(e);
+  });
+}
+function markChatRead() {
+  unreadCount = 0;
+  updateChatBadge();
+  if (allExpenses.length > 0) {}
+  db.ref('messages').orderByChild('timestamp').limitToLast(1).once('value').then(snap => {
+    let latest = null;
+    snap.forEach(c => latest = c.val());
+    if (latest && latest.userId !== currentUserId) {
+      lastSeenMsgTs = latest.timestamp;
+      localStorage.setItem('lastSeenMsgTs', lastSeenMsgTs);
+    }
+  });
+}
+function updateChatBadge() {
+  const b1 = document.getElementById('chatBadge');
+  const b2 = document.getElementById('chatFabBadge');
+  [b1, b2].forEach(b => {
+    if (!b) return;
+    if (unreadCount > 0) {
+      b.style.display = 'flex';
+      b.textContent = unreadCount > 99 ? '99+' : unreadCount;
+    } else {
+      b.style.display = 'none';
+    }
+  });
+}
+// listener unread count
+function startUnreadListener() {
+  db.ref('messages').orderByChild('timestamp').startAt(lastSeenMsgTs + 1).on('child_added', snap => {
+    const m = snap.val();
+    if (m && m.userId !== currentUserId && !chatOpen) {
+      unreadCount++;
+      updateChatBadge();
+      showToast('💬 ข้อความใหม่จากที่รัก');
+      if (navigator.vibrate && !muted) navigator.vibrate([50, 50, 50]);
+    }
+  });
+}
+
+/* ============================================================
+   MENU / MODALS
+============================================================ */
+function openMenu() {
+  haptic();
+  document.getElementById('sideMenu').classList.add('show');
+  document.getElementById('menuOverlay').classList.add('show');
+}
+function closeMenu() {
+  document.getElementById('sideMenu').classList.remove('show');
+  document.getElementById('menuOverlay').classList.remove('show');
+}
 function openSettings() {
   haptic();
   document.getElementById('budgetInput').value = dailyBudget;
   document.getElementById('avatarInput').value = document.getElementById('avatar').textContent;
+  // set active theme/font
+  document.querySelectorAll('.theme-card').forEach(el => {
+    el.classList.toggle('active', el.dataset.theme === currentTheme);
+  });
+  document.querySelectorAll('.font-btn').forEach(el => {
+    el.classList.toggle('active', el.dataset.font === currentFont);
+  });
   document.getElementById('settingsModal').classList.add('show');
 }
 function closeSettings() { document.getElementById('settingsModal').classList.remove('show'); }
-function setTheme(t) { haptic(); document.body.dataset.theme = t; }
-
 function saveSettings() {
   const budget = parseFloat(document.getElementById('budgetInput').value) || 100;
   const avatar = document.getElementById('avatarInput').value || '🧸';
-  db.ref('settings').update({ dailyBudget: budget, avatar });
+  db.ref('settings').update({ dailyBudget: budget, avatar, theme: currentTheme, font: currentFont });
   dailyBudget = budget;
   document.getElementById('avatar').textContent = avatar;
   closeSettings();
   updateUI();
   showToast('บันทึกแล้วน้า 💕');
 }
-
 function toggleMute() {
   muted = !muted;
   document.getElementById('muteBtn').textContent = muted ? '🔕' : '🔔';
@@ -909,13 +1525,51 @@ function toggleMute() {
   localStorage.setItem('muted', muted);
 }
 
-// ====== INIT ======
-muted = localStorage.getItem('muted') === 'true';
-if (muted) {
-  document.getElementById('muteBtn').textContent = '🔕';
-  document.getElementById('muteBtn').classList.add('muted');
+/* ============================================================
+   CHAT EMOJI PICKER
+============================================================ */
+function initChatEmojiPicker() {
+  const picker = document.getElementById('chatEmojiPicker');
+  const emojis = ['💕','💖','🎀','🌸','🥰','😘','🐻','🐼','🐰','✨','💗','💝','😍','🤗','💐','🌹','💞','💘'];
+  picker.innerHTML = '';
+  emojis.forEach(e => {
+    const s = document.createElement('span');
+    s.textContent = e;
+    s.onclick = () => {
+      const inp = document.getElementById('chatInput');
+      inp.value = e + inp.value;
+      inp.focus();
+    };
+    picker.appendChild(s);
+  });
 }
-loadFromFirebase();
+
+/* ============================================================
+   INIT
+============================================================ */
+function init() {
+  applyTheme();
+  createBgHearts();
+  initChatEmojiPicker();
+  
+  muted = localStorage.getItem('muted') === 'true';
+  if (muted) {
+    document.getElementById('muteBtn').textContent = '🔕';
+    document.getElementById('muteBtn').classList.add('muted');
+  }
+  
+  loadFromFirebase();
+  startUnreadListener();
+  updateChatBadge();
+  
+  // ปิด modal เมื่อคลิกข้างนอก
+  document.querySelectorAll('.modal').forEach(m => {
+    m.addEventListener('click', e => {
+      if (e.target === m) m.classList.remove('show');
+    });
+  });
+}
+init();
 </script>
 </body>
 </html>
