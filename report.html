@@ -1,1 +1,1132 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>💕 รายงานแฟน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&family=Itim&family=Prompt:wght@400;600&family=Kanit:wght@400;600&family=Sarabun:wght@400;600&family=Chakra+Petch:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+/* ============================================================
+   THEME VARIABLES
+============================================================ */
+:root{
+  --primary:#FF69B4;--primary-dark:#FF1493;--primary-light:#FFB6C1;
+  --bg1:#FFE4EC;--bg2:#FFC0CB;--bg3:#FFB6C1;
+  --text:#C71585;--text-light:#FF69B4;
+  --card:rgba(255,255,255,0.92);--card-border:rgba(255,255,255,0.95);
+  --shadow:rgba(255,105,180,0.3);--danger:#FF4757;
+  --chat-me-start:#FFB6C1;--chat-me-end:#FF69B4;
+  --chat-them-bg:rgba(255,255,255,0.95);
+  --chat-them-border:rgba(255,182,193,0.5);
+  --font:'Mali',cursive;
+  --bg-pattern:radial-gradient(circle at 20% 30%, rgba(255,255,255,0.4) 0%, transparent 40%);
+}
+body[data-theme="sakura"]{--primary:#FF85A2;--primary-dark:#E91E63;--primary-light:#FFC1CC;--bg1:#FFF5F8;--bg2:#FFE4EC;--bg3:#FFD1DC;--text:#B03060;--text-light:#E91E63;--shadow:rgba(255,133,162,0.35);--chat-me-start:#FFB6C1;--chat-me-end:#FF85A2;--chat-them-bg:rgba(255,245,248,0.98);--chat-them-border:rgba(255,193,204,0.6);--bg-pattern:radial-gradient(circle at 80% 20%, rgba(255,193,204,0.3) 0%, transparent 50%);}
+body[data-theme="peach"]{--primary:#FFB07C;--primary-dark:#FF8C42;--primary-light:#FFD8B8;--bg1:#FFF8F0;--bg2:#FFE8D0;--bg3:#FFD1A8;--text:#C55A11;--text-light:#FF8C42;--shadow:rgba(255,176,124,0.4);--chat-me-start:#FFD8B8;--chat-me-end:#FFB07C;--chat-them-bg:rgba(255,248,240,0.98);--chat-them-border:rgba(255,216,184,0.6);--bg-pattern:radial-gradient(circle at 30% 70%, rgba(255,216,184,0.4) 0%, transparent 50%);}
+body[data-theme="mint"]{--primary:#7DD8A8;--primary-dark:#3CB371;--primary-light:#C8F5D8;--bg1:#F0FFF5;--bg2:#DCF8E5;--bg3:#B8EBC8;--text:#2E7D52;--text-light:#3CB371;--shadow:rgba(125,216,168,0.4);--chat-me-start:#C8F5D8;--chat-me-end:#7DD8A8;--chat-them-bg:rgba(240,255,245,0.98);--chat-them-border:rgba(200,245,216,0.6);--bg-pattern:radial-gradient(circle at 70% 30%, rgba(200,245,216,0.4) 0%, transparent 50%);}
+body[data-theme="sky"]{--primary:#7EC8E3;--primary-dark:#4A90C2;--primary-light:#C2E8F5;--bg1:#F0F9FF;--bg2:#DCF0FB;--bg3:#B8DEF2;--text:#2E5F8A;--text-light:#4A90C2;--shadow:rgba(126,200,227,0.4);--chat-me-start:#C2E8F5;--chat-me-end:#7EC8E3;--chat-them-bg:rgba(240,249,255,0.98);--chat-them-border:rgba(194,232,245,0.6);--bg-pattern:radial-gradient(circle at 50% 20%, rgba(194,232,245,0.4) 0%, transparent 50%);}
+body[data-theme="lavender"]{--primary:#C8A8E9;--primary-dark:#9370DB;--primary-light:#E6D0F5;--bg1:#F8F2FF;--bg2:#EDDFFA;--bg3:#DCC8F0;--text:#6B3FA0;--text-light:#9370DB;--shadow:rgba(200,168,233,0.4);--chat-me-start:#E6D0F5;--chat-me-end:#C8A8E9;--chat-them-bg:rgba(248,242,255,0.98);--chat-them-border:rgba(230,208,245,0.6);--bg-pattern:radial-gradient(circle at 30% 40%, rgba(230,208,245,0.4) 0%, transparent 50%);}
+body[data-theme="midnight"]{--primary:#FF69B4;--primary-dark:#FF1493;--primary-light:#FF85C0;--bg1:#0F0815;--bg2:#1A1020;--bg3:#2A1A35;--text:#FFB6D9;--text-light:#FF85C0;--card:rgba(40,25,55,0.85);--card-border:rgba(120,80,140,0.6);--shadow:rgba(255,105,180,0.5);--chat-me-start:#FF69B4;--chat-me-end:#FF1493;--chat-them-bg:rgba(50,30,70,0.95);--chat-them-border:rgba(255,133,192,0.3);--bg-pattern:radial-gradient(circle at 50% 50%, rgba(255,105,180,0.15) 0%, transparent 60%);}
 
+/* ============================================================
+   RESET & BASE
+============================================================ */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{overscroll-behavior:none;height:100%;}
+body{
+  font-family:var(--font);
+  background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 50%,var(--bg3) 100%);
+  min-height:100vh;padding:16px;color:var(--text);
+  overflow-x:hidden;transition:background 0.8s ease,color 0.5s ease;
+  padding-bottom:100px;-webkit-font-smoothing:antialiased;font-size:15px;
+  position:relative;
+}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:var(--bg-pattern);transition:background 0.8s ease;}
+
+/* BG HEARTS */
+.bg-hearts{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;contain:strict;}
+.bg-hearts span{position:absolute;font-size:16px;will-change:transform;animation:floatUp 18s linear infinite;transform:translateZ(0);opacity:0.7;}
+@keyframes floatUp{0%{transform:translate3d(0,100vh,0);opacity:0}10%{opacity:0.6}90%{opacity:0.6}100%{transform:translate3d(0,-10vh,0);opacity:0}}
+
+.container{max-width:500px;margin:0 auto;position:relative;z-index:1;}
+
+/* TOP BAR */
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:6px;}
+.avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--primary-light),var(--primary));display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;box-shadow:0 4px 16px var(--shadow);border:2px solid white;transition:transform 0.2s ease;flex-shrink:0;}
+.avatar:active{transform:scale(0.9);}
+.top-icons{display:flex;gap:6px;align-items:center;}
+.icon-btn{width:40px;height:40px;border-radius:50%;background:var(--card);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;border:2px solid var(--card-border);transition:transform 0.2s ease, box-shadow 0.2s;position:relative;}
+.icon-btn:active{transform:scale(0.9);}
+.icon-btn .badge{position:absolute;top:-2px;right:-2px;background:linear-gradient(135deg,#FF6B6B,#FF1493);color:white;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px;border:2px solid white;font-family:sans-serif;animation:badgePulse 1.5s ease-in-out infinite;}
+@keyframes badgePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+
+.header{text-align:center;font-size:24px;font-weight:700;margin:8px 0;background:linear-gradient(135deg,var(--primary),var(--primary-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 2px 4px var(--shadow));}
+
+/* TIME */
+.time-counter{text-align:center;background:var(--card);backdrop-filter:blur(12px);border-radius:22px;padding:14px 16px;margin-bottom:14px;border:2px solid var(--card-border);box-shadow:0 6px 20px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.5);font-size:13px;font-weight:600;transition:background 0.6s ease;}
+.time-counter .time-label{font-size:12px;color:var(--text-light);margin-bottom:6px;letter-spacing:0.5px;}
+.time-counter .time-display{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;font-size:14px;font-weight:700;color:var(--primary-dark);}
+.time-counter .time-display span{background:var(--bg1);padding:5px 11px;border-radius:12px;min-width:50px;border:1.5px solid var(--primary-light);transition:all 0.3s ease;box-shadow:0 2px 6px rgba(0,0,0,0.04);}
+.time-counter .time-display span.tick{transform:scale(1.1);background:linear-gradient(135deg,var(--primary-light),var(--primary));color:white;border-color:var(--primary-dark);}
+
+/* ZONE */
+.zone-label{font-size:15px;font-weight:700;color:var(--primary-dark);margin:14px 0 8px;padding-left:4px;display:flex;align-items:center;gap:6px;}
+.zone{background:var(--card);backdrop-filter:blur(12px);border-radius:24px;padding:18px;margin-bottom:12px;border:2px solid var(--card-border);box-shadow:0 8px 24px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.5);transition:background 0.6s ease;}
+
+/* MONEY */
+.money-zone{background:linear-gradient(135deg,var(--card) 0%,var(--bg1) 100%);border-radius:28px;padding:24px;border:3px solid var(--primary);box-shadow:0 10px 30px var(--shadow),0 0 0 5px var(--primary-light), inset 0 2px 0 rgba(255,255,255,0.6);text-align:center;position:relative;overflow:hidden;}
+.money-zone::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,var(--primary-light),var(--primary),var(--primary-dark),var(--primary),var(--primary-light));background-size:200% 100%;animation:shimmerTop 3s linear infinite;}
+@keyframes shimmerTop{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.money-zone .label{font-size:13px;color:var(--text-light);font-weight:600;letter-spacing:0.5px;}
+.money-zone .remain{font-size:60px;font-weight:700;line-height:1;margin:8px 0;background:linear-gradient(135deg,var(--primary),var(--primary-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 4px 8px var(--shadow));}
+.money-zone .remain.pulse{animation:pulse 0.5s ease-out;}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.progress-bar{background:var(--bg1);border-radius:20px;height:18px;margin:14px 0;overflow:hidden;box-shadow:inset 0 2px 6px rgba(0,0,0,0.1);border:1.5px solid var(--primary-light);}
+.progress-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--primary-light),var(--primary),var(--primary-dark));background-size:200% 100%;transition:width 0.8s cubic-bezier(0.34,1.2,0.64,1);animation:shimmer 2s linear infinite;will-change:width;box-shadow:0 0 10px var(--primary);}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.money-zone .stats{font-size:13px;color:var(--text-light);font-weight:600;margin-top:8px;}
+.money-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+
+/* BUTTONS */
+button.main-btn{width:100%;padding:16px;border:none;border-radius:18px;background:linear-gradient(135deg,var(--primary-light),var(--primary));color:white;font-size:15px;font-weight:700;margin-bottom:10px;cursor:pointer;font-family:inherit;box-shadow:0 6px 18px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.4);transition:transform 0.15s ease, box-shadow 0.15s ease;will-change:transform;}
+button.main-btn:active{transform:scale(0.96);box-shadow:0 3px 10px var(--shadow);}
+button.ghost{background:var(--card);color:var(--text);border:2px solid var(--primary-light);box-shadow:none;}
+button.ghost:active{background:var(--bg1);}
+button.danger{background:linear-gradient(135deg,#FF6B6B,#FF4757);box-shadow:0 4px 14px rgba(255,71,87,0.4);}
+
+/* PET */
+.pet-card{text-align:center;}
+.pet-name{font-size:17px;font-weight:700;color:var(--primary-dark);margin-bottom:4px;}
+.pet-level{font-size:12px;color:var(--text-light);background:var(--bg1);padding:4px 12px;border-radius:12px;display:inline-block;margin-bottom:8px;border:1.5px solid var(--primary-light);}
+.pet-stage{height:110px;display:flex;align-items:center;justify-content:center;perspective:600px;}
+.dog{font-size:72px;user-select:none;will-change:transform;animation:dogIdle 3s ease-in-out infinite;filter:drop-shadow(0 8px 16px var(--shadow));display:inline-block;}
+@keyframes dogIdle{0%,100%{transform:translate3d(0,0,0) rotate(-3deg)}50%{transform:translate3d(0,-10px,0) rotate(3deg)}}
+.pet-stats{display:flex;gap:8px;margin:12px 0;}
+.pet-stat{flex:1;background:var(--bg1);border-radius:14px;padding:10px;border:1.5px solid var(--primary-light);}
+.pet-stat-label{font-size:11px;font-weight:600;margin-bottom:6px;}
+.pet-stat-bar{background:var(--card);border-radius:8px;height:12px;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.08);}
+.pet-stat-fill{height:100%;border-radius:8px;transition:width 0.8s cubic-bezier(0.34,1.2,0.64,1);}
+.fill-hunger{background:linear-gradient(90deg,var(--primary-light),var(--primary));}
+.fill-happy{background:linear-gradient(90deg,#FFD700,#FFA500);}
+
+/* FULL PAGE */
+.full-page{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 50%,var(--bg3) 100%);z-index:500;display:none;flex-direction:column;will-change:transform;transition:background 0.8s ease;}
+.full-page.show{display:flex;animation:slideInRight 0.35s cubic-bezier(0.34,1.1,0.64,1);}
+@keyframes slideInRight{from{transform:translateX(100%);opacity:0.8}to{transform:translateX(0);opacity:1}}
+.fp-header{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--card);backdrop-filter:blur(15px);border-bottom:2px solid var(--primary-light);flex-shrink:0;box-shadow:0 2px 12px var(--shadow);}
+.fp-back{width:42px;height:42px;border-radius:50%;background:var(--bg1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;font-weight:700;color:var(--primary-dark);border:2px solid var(--primary-light);flex-shrink:0;transition:transform 0.15s ease;}
+.fp-back:active{transform:scale(0.9);}
+.fp-title{font-size:18px;font-weight:700;color:var(--primary-dark);flex:1;}
+.fp-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+/* CHAT */
+.chat-messages{flex:1;overflow-y:auto;padding:20px 16px;display:flex;flex-direction:column;gap:12px;-webkit-overflow-scrolling:touch;background:var(--bg1);}
+.chat-messages::-webkit-scrollbar{width:5px;}
+.chat-messages::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--primary-light),var(--primary));border-radius:3px;}
+.msg{max-width:82%;padding:14px 18px;border-radius:24px;font-size:16px;line-height:1.5;word-wrap:break-word;animation:msgIn 0.35s cubic-bezier(0.34,1.3,0.64,1);font-weight:500;box-shadow:0 3px 10px rgba(0,0,0,0.06);}
+@keyframes msgIn{0%{opacity:0;transform:translateY(12px) scale(0.9)}100%{opacity:1;transform:translateY(0) scale(1)}}
+.msg.me{align-self:flex-end;background:linear-gradient(135deg,var(--chat-me-start),var(--chat-me-end));color:white;border-bottom-right-radius:8px;box-shadow:0 4px 14px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.3);}
+.msg.them{align-self:flex-start;background:var(--chat-them-bg);color:var(--text);border:1.5px solid var(--chat-them-border);border-bottom-left-radius:8px;backdrop-filter:blur(10px);}
+.msg .msg-emoji{font-size:22px;margin-right:6px;display:inline-block;vertical-align:middle;animation:emojiPop 0.5s ease-out;}
+@keyframes emojiPop{0%{transform:scale(0.3) rotate(-20deg)}70%{transform:scale(1.2) rotate(10deg)}100%{transform:scale(1) rotate(0)}}
+.msg .msg-meta{font-size:11px;opacity:0.75;margin-top:6px;display:block;font-weight:400;text-align:right;letter-spacing:0.3px;}
+.msg.me .msg-meta{color:rgba(255,255,255,0.9);}
+.chat-emoji-picker{display:flex;gap:6px;padding:12px 14px;background:var(--card);border-top:1.5px solid var(--primary-light);overflow-x:auto;scrollbar-width:none;flex-shrink:0;backdrop-filter:blur(12px);}
+.chat-emoji-picker::-webkit-scrollbar{display:none;}
+.chat-emoji-picker span{font-size:26px;cursor:pointer;padding:6px 8px;border-radius:14px;flex-shrink:0;line-height:1;transition:all 0.2s ease;}
+.chat-emoji-picker span:active{transform:scale(1.3);background:var(--bg1);}
+.chat-input-bar{display:flex;gap:8px;padding:12px 14px;background:var(--card);border-top:1.5px solid var(--primary-light);align-items:center;flex-shrink:0;padding-bottom:calc(12px + env(safe-area-inset-bottom));backdrop-filter:blur(12px);}
+.chat-input-bar input{flex:1;padding:15px 20px;border:2px solid var(--primary-light);border-radius:26px;font-size:16px;font-family:inherit;background:var(--bg1);color:var(--text);outline:none;transition:all 0.3s ease;}
+.chat-input-bar input:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-light);transform:scale(1.01);}
+.chat-input-bar input::placeholder{color:var(--text-light);opacity:0.7;}
+.chat-send{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--primary-light),var(--primary-dark));color:white;border:none;cursor:pointer;font-size:22px;flex-shrink:0;box-shadow:0 6px 16px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;transition:transform 0.15s ease;}
+.chat-send:active{transform:scale(0.85) rotate(-10deg);}
+
+/* MAP */
+.map-tabs{display:flex;gap:8px;padding:12px 18px;background:var(--card);border-bottom:2px solid var(--primary-light);flex-shrink:0;backdrop-filter:blur(12px);}
+.map-tab{flex:1;padding:12px;border-radius:16px;background:var(--bg1);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;border:2px solid transparent;font-family:inherit;text-align:center;transition:all 0.3s ease;}
+.map-tab.active{background:linear-gradient(135deg,var(--primary-light),var(--primary));color:white;border-color:var(--primary-dark);box-shadow:0 4px 12px var(--shadow);}
+.map-tab:active{transform:scale(0.96);}
+.map-wrap{flex:1;position:relative;}
+.map-canvas{width:100%;height:100%;}
+.map-controls{position:absolute;bottom:20px;left:20px;right:20px;z-index:400;}
+.map-info{background:var(--card);backdrop-filter:blur(15px);padding:14px 18px;border-radius:20px;border:2px solid var(--card-border);box-shadow:0 8px 24px var(--shadow);font-size:14px;line-height:1.6;font-weight:600;margin-bottom:10px;}
+.map-info b{color:var(--primary-dark);}
+.map-btn{width:100%;padding:16px;border:none;border-radius:20px;background:linear-gradient(135deg,var(--primary-light),var(--primary-dark));color:white;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 8px 22px var(--shadow);display:flex;align-items:center;justify-content:center;gap:8px;transition:transform 0.15s ease;}
+.map-btn:active{transform:scale(0.96);}
+
+/* CHART */
+.chart-wrap{padding:20px;}
+.chart-card{background:var(--card);border-radius:24px;padding:22px;border:2px solid var(--card-border);box-shadow:0 8px 24px var(--shadow);}
+.chart-title{font-size:17px;font-weight:700;color:var(--primary-dark);text-align:center;margin-bottom:18px;}
+.chart-box{display:flex;align-items:flex-end;justify-content:space-around;height:200px;padding:10px 5px;gap:6px;}
+.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;}
+.chart-col .bar-val{font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;background:var(--bg1);padding:3px 8px;border-radius:10px;border:1px solid var(--primary-light);}
+.chart-col .bar{width:100%;max-width:42px;border-radius:10px 10px 0 0;background:linear-gradient(180deg,var(--primary-light),var(--primary-dark));transition:height 0.8s cubic-bezier(0.34,1.2,0.64,1);min-height:6px;will-change:height;box-shadow:0 -2px 8px var(--shadow);}
+.chart-col .bar-lbl{font-size:13px;font-weight:700;margin-top:8px;color:var(--text);}
+.chart-col .bar-date{font-size:10px;color:var(--text-light);margin-top:2px;}
+.chart-total{text-align:center;font-size:15px;font-weight:700;color:var(--primary-dark);margin-top:14px;padding:12px;background:var(--bg1);border-radius:16px;border:1px solid var(--primary-light);}
+
+/* HISTORY */
+.history-wrap{padding:16px;}
+.history-item{background:linear-gradient(135deg,var(--bg1),var(--bg2));padding:14px 16px;border-radius:16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600;border:1.5px solid var(--card-border);animation:msgIn 0.35s cubic-bezier(0.34,1.3,0.64,1);box-shadow:0 2px 8px rgba(0,0,0,0.04);}
+.history-item .info{flex:1;text-align:left;}
+.history-item .time{font-size:11px;color:var(--text-light);font-weight:400;display:block;margin-top:3px;}
+.history-item .actions{display:flex;gap:6px;}
+.history-item .actions button{width:34px;height:34px;padding:0;border-radius:50%;background:var(--card);color:var(--primary-dark);font-size:15px;border:1.5px solid var(--primary-light);cursor:pointer;transition:transform 0.15s;}
+.history-item .actions button:active{transform:scale(0.85);}
+.history-item .fav-btn.active{background:#FFD700;color:white;}
+
+/* INFO */
+.info-wrap{padding:16px;}
+.info-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.info-title{font-size:16px;font-weight:700;color:var(--primary-dark);}
+.info-item{background:linear-gradient(135deg,var(--bg1),var(--bg2));padding:14px 18px;border-radius:18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border:1.5px solid var(--card-border);animation:msgIn 0.35s cubic-bezier(0.34,1.3,0.64,1);box-shadow:0 2px 8px rgba(0,0,0,0.04);}
+.info-item .info-content{flex:1;text-align:left;}
+.info-item .info-label{font-size:12px;color:var(--text-light);font-weight:600;display:block;margin-bottom:3px;}
+.info-item .info-value{font-size:15px;font-weight:700;color:var(--text);word-break:break-word;}
+.info-item .info-actions{display:flex;gap:6px;margin-left:10px;}
+.info-item .info-actions button{width:34px;height:34px;padding:0;border-radius:50%;background:var(--card);color:var(--primary-dark);font-size:14px;border:1.5px solid var(--primary-light);cursor:pointer;}
+.info-empty{text-align:center;padding:40px 20px;color:var(--text-light);font-size:14px;line-height:1.8;}
+.info-add-btn{width:100%;padding:14px;border:2px dashed var(--primary-light);background:transparent;color:var(--primary-dark);font-size:14px;font-weight:700;border-radius:16px;cursor:pointer;font-family:inherit;margin-top:8px;transition:all 0.2s ease;}
+.info-add-btn:active{background:var(--bg1);transform:scale(0.98);}
+
+/* TOAST */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--card);backdrop-filter:blur(15px);padding:13px 22px;border-radius:20px;box-shadow:0 8px 24px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.5);color:var(--primary-dark);font-weight:700;z-index:9999;font-size:14px;animation:toastIn 0.4s cubic-bezier(0.34,1.3,0.64,1);max-width:90vw;text-align:center;border:2px solid var(--card-border);}
+@keyframes toastIn{0%{transform:translate(-50%,-30px);opacity:0}100%{transform:translate(-50%,0);opacity:1}}
+
+/* MODAL */
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);justify-content:center;align-items:center;z-index:300;padding:20px;}
+.modal.show{display:flex;}
+.modal-content{background:var(--card);backdrop-filter:blur(20px);border-radius:28px;padding:26px;width:100%;max-width:380px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:popIn 0.35s cubic-bezier(0.34,1.4,0.64,1);max-height:85vh;overflow-y:auto;border:2px solid var(--card-border);}
+@keyframes popIn{0%{transform:scale(0.8);opacity:0}100%{transform:scale(1);opacity:1}}
+.modal-content h3{color:var(--primary-dark);margin-bottom:14px;font-size:20px;}
+.modal-content .label{font-size:13px;color:var(--text-light);font-weight:600;text-align:left;padding-left:4px;margin-top:10px;display:block;}
+.modal-content input,.modal-content select{width:100%;padding:14px;border:2px solid var(--primary-light);border-radius:16px;font-size:15px;margin:6px 0;text-align:center;font-family:inherit;background:var(--bg1);color:var(--text);outline:none;transition:all 0.25s ease;}
+.modal-content input:focus,.modal-content select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-light);}
+.modal-content textarea{width:100%;padding:14px;border:2px solid var(--primary-light);border-radius:16px;font-size:15px;margin:6px 0;font-family:inherit;background:var(--bg1);color:var(--text);outline:none;resize:none;}
+.modal-content textarea:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-light);}
+
+/* THEME PICKER */
+.theme-picker{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0;}
+.theme-card{border-radius:16px;padding:10px 4px;cursor:pointer;border:3px solid transparent;text-align:center;font-size:11px;font-weight:700;color:var(--text);transition:all 0.25s ease;}
+.theme-card:active{transform:scale(0.94);}
+.theme-card.active{border-color:var(--primary-dark);box-shadow:0 4px 12px var(--shadow);transform:scale(1.03);}
+.theme-swatch{width:100%;height:38px;border-radius:12px;margin-bottom:6px;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.5), 0 2px 8px rgba(0,0,0,0.1);position:relative;overflow:hidden;}
+.theme-swatch::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), transparent 60%);}
+.theme-sakura{background:linear-gradient(135deg,#FFF5F8,#FF85A2);}
+.theme-peach{background:linear-gradient(135deg,#FFF8F0,#FFB07C);}
+.theme-mint{background:linear-gradient(135deg,#F0FFF5,#7DD8A8);}
+.theme-sky{background:linear-gradient(135deg,#F0F9FF,#7EC8E3);}
+.theme-lavender{background:linear-gradient(135deg,#F8F2FF,#C8A8E9);}
+.theme-midnight{background:linear-gradient(135deg,#0F0815,#FF69B4);}
+
+/* FONT PICKER */
+.font-picker{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}
+.font-btn{padding:11px 8px;border-radius:14px;border:2px solid var(--primary-light);background:var(--bg1);color:var(--text);cursor:pointer;font-size:13px;font-weight:600;transition:all 0.2s ease;font-family:inherit;}
+.font-btn:active{transform:scale(0.95);}
+.font-btn.active{background:linear-gradient(135deg,var(--primary-light),var(--primary));color:white;border-color:var(--primary-dark);box-shadow:0 4px 12px var(--shadow);}
+
+/* LOADING */
+.loading{text-align:center;padding:40px;font-size:18px;color:var(--primary);animation:pulse 1.5s infinite;}
+
+/* DANGER ZONE */
+.danger-box{background:rgba(255,71,87,0.08);border:2px solid rgba(255,71,87,0.3);border-radius:20px;padding:16px;margin-top:14px;}
+.danger-box h4{color:var(--danger);font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.danger-box p{font-size:12px;color:var(--text);opacity:0.85;line-height:1.5;margin-bottom:12px;text-align:left;}
+</style>
+</head>
+<body data-theme="sakura">
+<div class="bg-hearts" id="bgHearts"></div>
+
+<div class="container">
+  <div class="top-bar">
+    <div class="avatar" id="avatar" onclick="openSettings()">🐻</div>
+    <div class="top-icons">
+      <div class="icon-btn" id="muteBtn" onclick="toggleMute()">🔔</div>
+      <div class="icon-btn" onclick="openChat()">💬<span class="badge" id="chatBadge" style="display:none;">0</span></div>
+      <div class="icon-btn" onclick="openMenu()">☰</div>
+    </div>
+  </div>
+
+  <div class="header">💕 รายงานแฟนจ้า</div>
+
+  <div class="time-counter">
+    <div class="time-label">💕 คบกันมาแล้ว</div>
+    <div class="time-display">
+      <span id="tDay">0 วัน</span>
+      <span id="tHour">00 ชม.</span>
+      <span id="tMin">00 นาที</span>
+      <span id="tSec">00 วิ</span>
+    </div>
+  </div>
+
+  <div id="mainContent" style="display:none;">
+    <div class="zone-label">💰 เงินของแฟน</div>
+    <div class="money-zone">
+      <div class="label">เหลือวันนี้</div>
+      <div class="remain" id="remain">100</div>
+      <div class="label">บาท</div>
+      <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+      <div class="stats">วันนี้ใช้ไป <b id="todayTotal">0</b> บาท · เป้า <b id="dailyBudget">100</b> บาท</div>
+      <div class="money-actions">
+        <button class="main-btn ghost" onclick="openHistory()">📜 ประวัติ</button>
+        <button class="main-btn ghost" onclick="openChart()">📊 กราฟ 7 วัน</button>
+      </div>
+    </div>
+
+    <div class="zone-label">🐶 โบโบ้</div>
+    <div class="zone pet-card">
+      <div class="pet-name">🐶 โบโบ้</div>
+      <div class="pet-level" id="petLevel">Lv.1 ✨ 0/100</div>
+      <div class="pet-stage"><div class="dog" id="dogPreview">🐶</div></div>
+      <div class="pet-stats">
+        <div class="pet-stat">
+          <div class="pet-stat-label">🍖 ความอิ่ม</div>
+          <div class="pet-stat-bar"><div class="pet-stat-fill fill-hunger" id="hungerBar" style="width:100%"></div></div>
+        </div>
+        <div class="pet-stat">
+          <div class="pet-stat-label">💕 ความสุข</div>
+          <div class="pet-stat-bar"><div class="pet-stat-fill fill-happy" id="happyBar" style="width:100%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="main-btn" onclick="openMap()">📍 ดูตำแหน่งแฟน</button>
+    <button class="main-btn" onclick="openInfo()">💌 ข้อมูลส่วนตัว</button>
+    <button class="main-btn" onclick="openSend()">✉️ ส่งข้อความหาแฟน</button>
+    <button class="main-btn ghost" onclick="openChat()">💬 แชทกับแฟน</button>
+  </div>
+
+  <div class="loading" id="loadingBox">💕 กำลังโหลดน้า...</div>
+</div>
+
+<!-- CHAT FULL -->
+<div class="full-page" id="chatPage">
+  <div class="fp-header">
+    <div class="fp-back" onclick="closeChat()">←</div>
+    <div class="fp-title">💬 แชทกับแฟน</div>
+  </div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-emoji-picker" id="chatEmojiPicker"></div>
+  <div class="chat-input-bar">
+    <input type="text" id="chatInput" placeholder="พิมพ์ข้อความ..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="chat-send" onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<!-- MAP FULL -->
+<div class="full-page" id="mapPage">
+  <div class="fp-header">
+    <div class="fp-back" onclick="closeMap()">←</div>
+    <div class="fp-title">📍 แผนที่</div>
+  </div>
+  <div class="map-tabs">
+    <button class="map-tab" id="tabKwang" onclick="switchMap('kwang')">🌸 <span id="nameKwangTab">กวาง</span></button>
+    <button class="map-tab active" id="tabBoom" onclick="switchMap('boom')">🐻 <span id="nameBoomTab">บูม</span></button>
+  </div>
+  <div class="map-wrap">
+    <div id="mapFull" class="map-canvas"></div>
+    <div class="map-controls">
+      <div class="map-info" id="locationInfoFull">📍 ยังไม่มีตำแหน่ง</div>
+      <button class="map-btn" onclick="updateLocation()">📍 <span id="btnUpdateLabel">อัปเดตตำแหน่งของฉัน</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- CHART FULL -->
+<div class="full-page" id="chartPage">
+  <div class="fp-header">
+    <div class="fp-back" onclick="closeChart()">←</div>
+    <div class="fp-title">📊 กราฟ 7 วัน</div>
+  </div>
+  <div class="fp-body">
+    <div class="chart-wrap" id="chartFull"></div>
+  </div>
+</div>
+
+<!-- HISTORY FULL -->
+<div class="full-page" id="historyPage">
+  <div class="fp-header">
+    <div class="fp-back" onclick="closeHistory()">←</div>
+    <div class="fp-title">📜 ประวัติ</div>
+  </div>
+  <div class="fp-body">
+    <div class="history-wrap" id="historyFull"></div>
+  </div>
+</div>
+
+<!-- INFO FULL -->
+<div class="full-page" id="infoPage">
+  <div class="fp-header">
+    <div class="fp-back" onclick="closeInfo()">←</div>
+    <div class="fp-title">💌 ข้อมูลส่วนตัว</div>
+  </div>
+  <div class="map-tabs">
+    <button class="map-tab active" id="infoTabKwang" onclick="switchInfo('kwang')">🌸 <span id="infoNameKwang">กวาง</span></button>
+    <button class="map-tab" id="infoTabBoom" onclick="switchInfo('boom')">🐻 <span id="infoNameBoom">บูม</span></button>
+  </div>
+  <div class="fp-body">
+    <div class="info-wrap" id="infoFull"></div>
+  </div>
+</div>
+
+<!-- MENU -->
+<div class="modal" id="menuModal" onclick="if(event.target===this)closeMenu()">
+  <div class="modal-content" style="max-width:300px;">
+    <h3>🌸 เมนู</h3>
+    <button class="main-btn" onclick="openChat();closeMenu();">💬 แชทกับแฟน</button>
+    <button class="main-btn ghost" onclick="openInfo();closeMenu();">💌 ข้อมูลส่วนตัว</button>
+    <button class="main-btn ghost" onclick="openChart();closeMenu();">📊 กราฟ 7 วัน</button>
+    <button class="main-btn ghost" onclick="openMap();closeMenu();">📍 แผนที่</button>
+    <button class="main-btn ghost" onclick="openHistory();closeMenu();">📜 ประวัติ</button>
+    <button class="main-btn ghost" onclick="openSend();closeMenu();">✉️ ส่งข้อความเร็ว</button>
+    <button class="main-btn ghost" onclick="openSettings();closeMenu();">⚙️ ตั้งค่า</button>
+    <button class="main-btn ghost" onclick="closeMenu();">ปิด</button>
+  </div>
+</div>
+
+<!-- SEND QUICK -->
+<div class="modal" id="sendModal">
+  <div class="modal-content">
+    <h3>💌 ส่งข้อความหาแฟน</h3>
+    <input type="text" id="quickEmojiInput" value="💕" maxlength="2">
+    <div id="quickEmojiPicker" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:10px 0;"></div>
+    <textarea id="quickTextInput" rows="3" placeholder="พิมพ์ข้อความน่ารักๆ..."></textarea>
+    <button class="main-btn" onclick="sendQuickMessage()">💕 ส่งเลย</button>
+    <button class="main-btn ghost" onclick="closeSend()">ยกเลิก</button>
+  </div>
+</div>
+
+<!-- INFO EDIT -->
+<div class="modal" id="infoEditModal">
+  <div class="modal-content">
+    <h3 id="infoEditTitle">✏️ แก้ไขข้อมูล</h3>
+    <span class="label">🏷️ หัวข้อ</span>
+    <input type="text" id="infoLabelInput" placeholder="เช่น ชื่อเล่น, วันเกิด">
+    <span class="label">📝 ค่า</span>
+    <input type="text" id="infoValueInput" placeholder="เช่น บูม, 24 ส.ค.">
+    <button class="main-btn" onclick="saveInfoItem()">💾 บันทึก</button>
+    <button class="main-btn ghost" onclick="closeInfoEdit()">ยกเลิก</button>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="modal" id="settingsModal">
+  <div class="modal-content">
+    <h3>⚙️ ตั้งค่า</h3>
+    <span class="label">🎨 ธีม</span>
+    <div class="theme-picker">
+      <div class="theme-card" data-theme="sakura" onclick="setTheme('sakura')"><div class="theme-swatch theme-sakura"></div>ซากุระ</div>
+      <div class="theme-card" data-theme="peach" onclick="setTheme('peach')"><div class="theme-swatch theme-peach"></div>พีช</div>
+      <div class="theme-card" data-theme="mint" onclick="setTheme('mint')"><div class="theme-swatch theme-mint"></div>มินต์</div>
+      <div class="theme-card" data-theme="sky" onclick="setTheme('sky')"><div class="theme-swatch theme-sky"></div>ฟ้า</div>
+      <div class="theme-card" data-theme="lavender" onclick="setTheme('lavender')"><div class="theme-swatch theme-lavender"></div>ลาเวนเดอร์</div>
+      <div class="theme-card" data-theme="midnight" onclick="setTheme('midnight')"><div class="theme-swatch theme-midnight"></div>มืด</div>
+    </div>
+    <span class="label">✍️ ฟอนต์</span>
+    <div class="font-picker">
+      <button class="font-btn" data-font="Mali" onclick="setFont('Mali',event)">Mali</button>
+      <button class="font-btn" data-font="Itim" onclick="setFont('Itim',event)">Itim</button>
+      <button class="font-btn" data-font="Prompt" onclick="setFont('Prompt',event)">Prompt</button>
+      <button class="font-btn" data-font="Kanit" onclick="setFont('Kanit',event)">Kanit</button>
+      <button class="font-btn" data-font="Sarabun" onclick="setFont('Sarabun',event)">Sarabun</button>
+      <button class="font-btn" data-font="Chakra Petch" onclick="setFont('Chakra Petch',event)">Chakra</button>
+    </div>
+    <span class="label">💰 งบต่อวัน</span>
+    <input type="number" id="budgetInput" placeholder="100">
+    <span class="label">🐻 ชื่อของฉัน</span>
+    <input type="text" id="myNameInput" placeholder="บูม" maxlength="20">
+    <span class="label">🦌 ชื่อของที่รัก</span>
+    <input type="text" id="partnerNameInput" placeholder="กวาง" maxlength="20">
+    <span class="label">🖼️ รูปโปรไฟล์ (emoji)</span>
+    <input type="text" id="avatarInput" placeholder="🐻" maxlength="2">
+    <button class="main-btn" onclick="saveSettings()">💾 บันทึก</button>
+    <button class="main-btn ghost" onclick="closeSettings()">ปิด</button>
+
+    <div class="danger-box">
+      <h4>⚠️ โซนอันตราย</h4>
+      <p>ลบข้อมูลทั้งหมด: ข้อความ, รายจ่าย, หมา, ชื่อ, ตำแหน่ง, การตั้งค่า, ข้อมูลส่วนตัว, ปุ่มใช้บ่อย — <b>กู้คืนไม่ได้</b></p>
+      <button class="main-btn danger" onclick="confirmDeleteAll()">🗑 ลบข้อมูลทั้งหมด</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE 1 -->
+<div class="modal" id="deleteConfirm1">
+  <div class="modal-content">
+    <h3 style="color:var(--danger);">⚠️ แน่ใจหรือ?</h3>
+    <p style="font-size:14px;line-height:1.6;margin-bottom:16px;text-align:left;">
+      กำลังจะลบ <b>ทุกอย่าง</b>:<br>
+      💬 ข้อความทั้งหมด<br>
+      💰 รายจ่ายทุกบาท<br>
+      🐶 หมา (โบโบ้)<br>
+      📝 ชื่อ (บูม/กวาง)<br>
+      📍 ตำแหน่ง<br>
+      ⚙️ การตั้งค่า<br>
+      💌 ข้อมูลส่วนตัว<br>
+      ⚡ ปุ่มใช้บ่อย
+    </p>
+    <p style="font-size:13px;color:var(--danger);font-weight:700;margin-bottom:14px;">กู้คืนไม่ได้นะ!</p>
+    <button class="main-btn danger" onclick="confirmDeleteAllStep2()">⚠️ ยังจะลบต่อ</button>
+    <button class="main-btn ghost" onclick="closeDeleteConfirm1()">ยกเลิก</button>
+  </div>
+</div>
+
+<!-- DELETE 2 -->
+<div class="modal" id="deleteConfirm2">
+  <div class="modal-content">
+    <h3 style="color:var(--danger);">🚨 ยืนยันครั้งสุดท้าย</h3>
+    <p style="font-size:14px;margin-bottom:12px;">พิมพ์คำว่า <b style="color:var(--danger);">"ลบทั้งหมด"</b> เพื่อยืนยัน</p>
+    <input type="text" id="deleteConfirmInput" placeholder="ลบทั้งหมด" style="text-align:center;">
+    <button class="main-btn danger" onclick="executeDeleteAll()">🗑 ลบเลย</button>
+    <button class="main-btn ghost" onclick="closeDeleteConfirm2()">ยกเลิก</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* ============ FIREBASE ============ */
+const firebaseConfig = { databaseURL: "https://lovewallet-71a77-default-rtdb.asia-southeast1.firebasedatabase.app" };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+/* ============ ROLE (คุณ = บูม) ============ */
+const MY_ROLE = 'boom';
+const MY_LOCATION_PATH = 'location_boom';
+const PARTNER_LOCATION_PATH = 'location_kwang';
+const MY_INFO_PATH = 'info_boom';
+const PARTNER_INFO_PATH = 'info_kwang';
+
+/* ============ STATE ============ */
+let allExpenses = [], monthExpenses = [], todayTotal = 0, dailyBudget = 100;
+let muted = false;
+let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+let pet = { hunger: 100, happy: 100, level: 1, exp: 0 };
+let currentTheme = localStorage.getItem('theme') || 'sakura';
+let currentFont = localStorage.getItem('font') || 'Mali';
+let chatListener = null, chatOpen = false;
+let mapOpen = false, mapCurrent = MY_ROLE;
+let mapInstance = null, mapMarker = null, mapRefListener = null;
+let lastSeenMsgTs = parseInt(localStorage.getItem('boom_lastSeenMsg') || '0');
+let unreadCount = 0;
+let expensesRef = null, settingsRef = null, petRef = null, infoListener = null;
+let infoCurrentTab = 'kwang';
+let infoData = { kwang: [], boom: [] };
+const uid = localStorage.getItem('boom_uid') || ('boom_' + Date.now());
+localStorage.setItem('boom_uid', uid);
+const currentUserId = uid;
+
+/* ============ NAMES ============ */
+let myName = localStorage.getItem('myName') || 'บูม';
+let partnerName = localStorage.getItem('partnerName') || 'กวาง';
+function applyNames() {
+  const k = document.getElementById('nameKwangTab');
+  const b = document.getElementById('nameBoomTab');
+  const k2 = document.getElementById('infoNameKwang');
+  const b2 = document.getElementById('infoNameBoom');
+  const lbl = document.getElementById('btnUpdateLabel');
+  if (k) k.textContent = partnerName;
+  if (b) b.textContent = myName;
+  if (k2) k2.textContent = partnerName;
+  if (b2) b2.textContent = myName;
+  if (lbl) lbl.textContent = 'อัปเดตตำแหน่งของ ' + myName;
+}
+
+/* ============ TIME ============ */
+const START_TIME = new Date('2023-08-24T00:00:00+07:00').getTime();
+function updateTimer() {
+  const diff = Date.now() - START_TIME;
+  if (diff < 0) return;
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  const dEl = document.getElementById('tDay'); if (!dEl) return;
+  dEl.textContent = d + ' วัน';
+  document.getElementById('tHour').textContent = String(h).padStart(2,'0') + ' ชม.';
+  document.getElementById('tMin').textContent = String(m).padStart(2,'0') + ' นาที';
+  const secEl = document.getElementById('tSec');
+  secEl.textContent = String(s).padStart(2,'0') + ' วิ';
+  secEl.classList.remove('tick'); void secEl.offsetWidth; secEl.classList.add('tick');
+}
+updateTimer(); setInterval(updateTimer, 1000);
+
+/* ============ BG HEARTS ============ */
+function createBgHearts() {
+  const box = document.getElementById('bgHearts');
+  box.innerHTML = '';
+  const themeEmojis = {
+    sakura: ['🌸','💕','💖','🎀','✨'],
+    peach: ['🍑','🧡','💛','✨','🌼'],
+    mint: ['🌿','💚','🍃','✨','🌸'],
+    sky: ['☁️','💙','🩵','✨','🌊'],
+    lavender: ['💜','🦄','✨','💫','🌸'],
+    midnight: ['⭐','🌙','✨','💫','🌟']
+  };
+  const arr = themeEmojis[currentTheme] || themeEmojis.sakura;
+  for (let i = 0; i < 8; i++) {
+    const h = document.createElement('span');
+    h.textContent = arr[i % arr.length];
+    h.style.left = (i * 12 + 4) + '%';
+    h.style.animationDelay = (i * 1.5) + 's';
+    h.style.animationDuration = (14 + (i % 4) * 2) + 's';
+    box.appendChild(h);
+  }
+}
+
+/* ============ THEME + FONT ============ */
+function setTheme(t) {
+  haptic(); currentTheme = t;
+  document.body.dataset.theme = t;
+  localStorage.setItem('theme', t);
+  createBgHearts();
+  document.querySelectorAll('.theme-card').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
+  db.ref('settings/theme').set(t).catch(()=>{});
+}
+function setFont(f, evt) {
+  haptic(); currentFont = f;
+  document.documentElement.style.setProperty('--font', `'${f}',cursive`);
+  document.body.style.fontFamily = `'${f}',cursive`;
+  localStorage.setItem('font', f);
+  document.querySelectorAll('.font-btn').forEach(el => el.classList.toggle('active', el.dataset.font === f));
+  if (evt && evt.currentTarget) {
+    document.querySelectorAll('.font-btn').forEach(el => el.classList.remove('active'));
+    evt.currentTarget.classList.add('active');
+  }
+  db.ref('settings/font').set(f).catch(()=>{});
+}
+function applyTheme() {
+  document.body.dataset.theme = currentTheme;
+  document.documentElement.style.setProperty('--font', `'${currentFont}',cursive`);
+  document.body.style.fontFamily = `'${currentFont}',cursive`;
+  document.querySelectorAll('.theme-card').forEach(el => el.classList.toggle('active', el.dataset.theme === currentTheme));
+  document.querySelectorAll('.font-btn').forEach(el => el.classList.toggle('active', el.dataset.font === currentFont));
+}
+
+/* ============ UTILS ============ */
+let toastTimer;
+function showToast(msg) {
+  const old = document.querySelector('.toast'); if (old) old.remove();
+  clearTimeout(toastTimer);
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  toastTimer = setTimeout(() => t.remove(), 2000);
+}
+function haptic(ms = 20) { if (navigator.vibrate) navigator.vibrate(ms); }
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+
+/* ============ PET ============ */
+function loadPet() {
+  if (petRef) petRef.off();
+  petRef = db.ref('pet');
+  petRef.on('value', snap => {
+    const p = snap.val();
+    if (p) pet = { hunger: p.hunger ?? 100, happy: p.happy ?? 100, level: p.level ?? 1, exp: p.exp ?? 0 };
+    updatePetUI();
+  });
+}
+function updatePetUI() {
+  const hb = document.getElementById('hungerBar'); if (!hb) return;
+  hb.style.width = pet.hunger + '%';
+  document.getElementById('happyBar').style.width = pet.happy + '%';
+  const expMax = pet.level * 100;
+  const expNow = pet.exp % expMax;
+  document.getElementById('petLevel').textContent = 'Lv.' + pet.level + ' ✨ ' + expNow + '/' + expMax;
+  const dog = document.getElementById('dogPreview');
+  dog.textContent = pet.happy < 30 ? '😢' : pet.hunger < 30 ? '🐕' : '🐶';
+}
+
+/* ============ MONEY ============ */
+function updateUI() {
+  const remain = Math.max(0, dailyBudget - todayTotal);
+  const el = document.getElementById('remain'); if (!el) return;
+  el.textContent = remain;
+  document.getElementById('todayTotal').textContent = todayTotal;
+  document.getElementById('dailyBudget').textContent = dailyBudget;
+  document.getElementById('progress').style.width = Math.min(100, (todayTotal / dailyBudget) * 100) + '%';
+  el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
+}
+function loadFromFirebase() {
+  if (expensesRef) expensesRef.off();
+  expensesRef = db.ref('expenses').orderByChild('timestamp');
+  expensesRef.on('value', snapshot => {
+    allExpenses = [];
+    snapshot.forEach(child => { allExpenses.push({ ...child.val(), key: child.key }); });
+    const now = new Date();
+    const todayKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+    const monthKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+    monthExpenses = allExpenses.filter(e => e.date_key === monthKey);
+    todayTotal = allExpenses.filter(e => e.day_key === todayKey).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+    updateUI();
+  });
+  if (settingsRef) settingsRef.off();
+  settingsRef = db.ref('settings');
+  settingsRef.on('value', snap => {
+    const s = snap.val() || {};
+    if (s.dailyBudget) dailyBudget = parseFloat(s.dailyBudget);
+    if (s.avatar) document.getElementById('avatar').textContent = s.avatar;
+    if (s.theme && !localStorage.getItem('theme')) setTheme(s.theme);
+    if (s.font && !localStorage.getItem('font')) setFont(s.font);
+    if (s.kwangName) { partnerName = s.kwangName; localStorage.setItem('partnerName', partnerName); }
+    if (s.boomName) { myName = s.boomName; localStorage.setItem('myName', myName); }
+    applyNames();
+    document.getElementById('loadingBox').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+    updateUI();
+    loadPet();
+  });
+}
+
+/* ============ CHAT ============ */
+function openChat() {
+  haptic(); chatOpen = true;
+  document.getElementById('chatPage').classList.add('show');
+  const chatBox = document.getElementById('chatMessages');
+  chatBox.innerHTML = '<div style="text-align:center;color:var(--text-light);font-size:14px;padding:30px;">💕 กำลังโหลดข้อความ...</div>';
+  markChatRead();
+  if (chatListener) { db.ref('messages').off('value', chatListener); chatListener = null; }
+  const ref = db.ref('messages').orderByChild('timestamp').limitToLast(200);
+  chatListener = ref.on('value', snap => {
+    const msgs = [];
+    snap.forEach(c => msgs.push({ ...c.val(), key: c.key }));
+    if (msgs.length === 0) {
+      chatBox.innerHTML = '<div style="text-align:center;color:var(--text-light);font-size:14px;padding:30px;">💕 ยังไม่มีข้อความ<br><span style="font-size:12px;">เริ่มพิมพ์เลยน้า</span></div>';
+      return;
+    }
+    let html = '';
+    msgs.forEach(m => {
+      const uid = m.userId || '';
+      const isMe = uid.includes(MY_ROLE) || uid === currentUserId;
+      html += '<div class="msg ' + (isMe ? 'me' : 'them') + '">';
+      if (m.emoji) html += '<span class="msg-emoji">' + escapeHtml(m.emoji) + '</span>';
+      html += escapeHtml(m.text || '');
+      html += '<span class="msg-meta">' + escapeHtml(m.time || '') + '</span>';
+      html += '</div>';
+    });
+    chatBox.innerHTML = html;
+    chatBox.scrollTop = chatBox.scrollHeight;
+    if (msgs.length > 0) {
+      const latest = msgs[msgs.length - 1];
+      const latestUid = latest.userId || '';
+      if (!latestUid.includes(MY_ROLE) && latest.timestamp > lastSeenMsgTs) {
+        lastSeenMsgTs = latest.timestamp;
+        localStorage.setItem('boom_lastSeenMsg', lastSeenMsgTs);
+        unreadCount = 0; updateChatBadge();
+      }
+    }
+  }, err => {
+    console.log('Chat err:', err);
+    chatBox.innerHTML = '<div style="text-align:center;color:var(--text-light);font-size:14px;padding:20px;">❌ โหลดข้อความไม่ได้<br>ลองปิด-เปิดใหม่นะ</div>';
+  });
+  setTimeout(() => { const inp = document.getElementById('chatInput'); if (inp) inp.focus(); }, 400);
+}
+function closeChat() {
+  chatOpen = false;
+  document.getElementById('chatPage').classList.remove('show');
+  if (chatListener) { db.ref('messages').off('value', chatListener); chatListener = null; }
+  markChatRead();
+}
+function sendChat() {
+  const inp = document.getElementById('chatInput');
+  const text = inp.value.trim();
+  if (!text) return;
+  haptic();
+  const now = new Date();
+  const msg = {
+    text, emoji: '', userId: currentUserId,
+    timestamp: Date.now(),
+    time: now.toLocaleTimeString('th-TH', {hour:'2-digit',minute:'2-digit'})
+  };
+  inp.value = '';
+  lastSeenMsgTs = msg.timestamp;
+  localStorage.setItem('boom_lastSeenMsg', lastSeenMsgTs);
+  db.ref('messages/' + msg.timestamp).set(msg).catch(e => {
+    console.log('Send err:', e);
+    showToast('ส่งไม่ได้ ลองอีกทีนะ 🥺');
+  });
+}
+function markChatRead() {
+  unreadCount = 0; updateChatBadge();
+  db.ref('messages').orderByChild('timestamp').limitToLast(1).once('value').then(snap => {
+    let latest = null;
+    snap.forEach(c => latest = c.val());
+    if (latest) {
+      const uid = latest.userId || '';
+      if (!uid.includes(MY_ROLE)) {
+        lastSeenMsgTs = latest.timestamp;
+        localStorage.setItem('boom_lastSeenMsg', lastSeenMsgTs);
+      }
+    }
+  });
+}
+function updateChatBadge() {
+  const b = document.getElementById('chatBadge'); if (!b) return;
+  if (unreadCount > 0) { b.style.display = 'flex'; b.textContent = unreadCount > 99 ? '99+' : unreadCount; }
+  else b.style.display = 'none';
+}
+function startUnreadListener() {
+  db.ref('messages').orderByChild('timestamp').startAt(lastSeenMsgTs + 1).on('child_added', snap => {
+    const m = snap.val(); if (!m) return;
+    const uid = m.userId || '';
+    if (!uid.includes(MY_ROLE) && !chatOpen) {
+      unreadCount++; updateChatBadge();
+      showToast('💬 ข้อความใหม่จากที่รัก');
+      if (navigator.vibrate && !muted) navigator.vibrate([50, 50, 50]);
+    }
+  });
+}
+function initChatEmojiPicker() {
+  const picker = document.getElementById('chatEmojiPicker');
+  const emojis = ['💕','💖','🎀','🌸','🥰','😘','🐻','🦌','🐰','✨','💗','💝','😍','🤗','💐','🌹','💞','💘'];
+  picker.innerHTML = '';
+  emojis.forEach(e => {
+    const s = document.createElement('span');
+    s.textContent = e;
+    s.onclick = () => { const inp = document.getElementById('chatInput'); inp.value = e + inp.value; inp.focus(); };
+    picker.appendChild(s);
+  });
+  const picker2 = document.getElementById('quickEmojiPicker');
+  if (picker2) {
+    picker2.innerHTML = '';
+    ['💕','💖','🎀','🌸','🥰','😘','🐻','🦌','✨','💗'].forEach(e => {
+      const s = document.createElement('span');
+      s.textContent = e;
+      s.style.fontSize = '24px'; s.style.cursor = 'pointer'; s.style.padding = '4px 6px';
+      s.onclick = () => { document.getElementById('quickEmojiInput').value = e; };
+      picker2.appendChild(s);
+    });
+  }
+}
+
+/* ============ SEND QUICK ============ */
+function openSend() { haptic(); document.getElementById('sendModal').classList.add('show'); }
+function closeSend() { document.getElementById('sendModal').classList.remove('show'); }
+function sendQuickMessage() {
+  const emoji = document.getElementById('quickEmojiInput').value || '💕';
+  const text = document.getElementById('quickTextInput').value.trim();
+  if (!text) { alert('พิมพ์ข้อความก่อนน้า 💕'); return; }
+  haptic();
+  const now = new Date();
+  db.ref('messages/' + Date.now()).set({
+    emoji, text, userId: currentUserId,
+    time: now.toLocaleTimeString('th-TH', {hour:'2-digit',minute:'2-digit'}),
+    timestamp: Date.now()
+  }).then(() => {
+    showToast('ส่งแล้วน้า 💕');
+    document.getElementById('quickTextInput').value = '';
+    closeSend();
+  }).catch(() => showToast('ส่งไม่ได้ ลองอีกทีนะ 🥺'));
+}
+
+/* ============ MAP ============ */
+function openMap() {
+  haptic(); mapOpen = true;
+  document.getElementById('mapPage').classList.add('show');
+  setTimeout(() => {
+    if (!mapInstance) initMap();
+    else mapInstance.invalidateSize();
+    switchMap(mapCurrent);
+  }, 250);
+}
+function closeMap() { mapOpen = false; document.getElementById('mapPage').classList.remove('show'); }
+function initMap() {
+  const el = document.getElementById('mapFull'); if (!el) return;
+  if (mapInstance) { mapInstance.remove(); mapInstance = null; }
+  mapInstance = L.map('mapFull', { attributionControl: false, zoomControl: true }).setView([13.7563, 100.5018], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(mapInstance);
+  setTimeout(() => mapInstance.invalidateSize(), 150);
+}
+function switchMap(who) {
+  mapCurrent = who;
+  document.getElementById('tabKwang').classList.toggle('active', who === 'kwang');
+  document.getElementById('tabBoom').classList.toggle('active', who === 'boom');
+  if (!mapInstance) initMap();
+  if (!mapInstance) return;
+  if (mapMarker) { mapInstance.removeLayer(mapMarker); mapMarker = null; }
+  if (mapRefListener) { db.ref(mapRefListener.path).off('value', mapRefListener.cb); mapRefListener = null; }
+  const isMine = (who === MY_ROLE);
+  const path = isMine ? MY_LOCATION_PATH : PARTNER_LOCATION_PATH;
+  const emoji = who === 'kwang' ? '🦌' : '🐻';
+  const displayName = who === 'kwang' ? partnerName : myName;
+  const icon = L.divIcon({
+    html: '<div style="font-size:44px;text-align:center;line-height:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3));">' + emoji + '</div>',
+    className: '', iconSize: [50, 50], iconAnchor: [25, 50]
+  });
+  mapMarker = L.marker([13.7563, 100.5018], { icon }).addTo(mapInstance);
+  document.getElementById('locationInfoFull').innerHTML = '📍 <b>' + escapeHtml(displayName) + '</b><br><span style="font-size:12px;">กำลังโหลด...</span>';
+  const cb = snap => {
+    const loc = snap.val();
+    if (loc && loc.lat && mapMarker) {
+      mapInstance.setView([loc.lat, loc.lng], 16);
+      mapMarker.setLatLng([loc.lat, loc.lng]);
+      document.getElementById('locationInfoFull').innerHTML = '📍 <b>' + escapeHtml(displayName) + '</b><br>ละติจูด: ' + loc.lat.toFixed(5) + '<br>ลองจิจูด: ' + loc.lng.toFixed(5) + '<br>อัปเดต: ' + escapeHtml(loc.time);
+    } else {
+      document.getElementById('locationInfoFull').innerHTML = '📍 <b>' + escapeHtml(displayName) + '</b><br><span style="font-size:12px;color:var(--text-light);">ยังไม่มีตำแหน่ง</span>';
+    }
+  };
+  db.ref(path).on('value', cb);
+  mapRefListener = { path, cb };
+  setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 150);
+}
+function updateLocation() {
+  if (!navigator.geolocation) { alert('เบราว์เซอร์ไม่รองรับ GPS'); return; }
+  document.getElementById('locationInfoFull').textContent = '📍 กำลังหาตำแหน่ง...';
+  navigator.geolocation.getCurrentPosition(pos => {
+    const lat = pos.coords.latitude, lng = pos.coords.longitude;
+    const time = new Date().toLocaleString('th-TH');
+    db.ref(MY_LOCATION_PATH).set({ lat, lng, time, timestamp: Date.now(), user: myName });
+    showToast('📍 อัปเดตตำแหน่งของ ' + myName + ' แล้ว');
+  }, err => {
+    document.getElementById('locationInfoFull').textContent = '❌ หาตำแหน่งไม่ได้';
+    showToast('❌ หาตำแหน่งไม่ได้ — เช็ค GPS');
+  }, { enableHighAccuracy: true, timeout: 10000 });
+}
+
+/* ============ CHART ============ */
+function openChart() { haptic(); document.getElementById('chartPage').classList.add('show'); renderChart(); }
+function closeChart() { document.getElementById('chartPage').classList.remove('show'); }
+function renderChart() {
+  const labels = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    const total = allExpenses.filter(e => e.day_key === key).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+    days.push({ label: labels[d.getDay()], total, date: d.getDate() + '/' + (d.getMonth() + 1) });
+  }
+  const max = Math.max(...days.map(d => d.total), 1);
+  const totalAll = days.reduce((s, d) => s + d.total, 0);
+  let html = '<div class="chart-card"><div class="chart-title">📊 รายจ่าย 7 วัน</div><div class="chart-box">';
+  days.forEach(d => {
+    const h = Math.max(8, (d.total / max) * 150);
+    html += '<div class="chart-col"><div class="bar-val">' + d.total + '</div><div class="bar" style="height:' + h + 'px;"></div><div class="bar-lbl">' + d.label + '</div><div class="bar-date">' + d.date + '</div></div>';
+  });
+  html += '</div><div class="chart-total">💕 รวม ' + totalAll + ' บาท</div></div>';
+  document.getElementById('chartFull').innerHTML = html;
+}
+
+/* ============ HISTORY ============ */
+function openHistory() { haptic(); document.getElementById('historyPage').classList.add('show'); renderHistory(); }
+function closeHistory() { document.getElementById('historyPage').classList.remove('show'); }
+function renderHistory() {
+  let html = '';
+  if (monthExpenses.length === 0) {
+    html = '<div style="text-align:center;padding:40px;color:var(--text-light);font-size:15px;">ยังไม่มีรายการน้า 🐰</div>';
+  } else {
+    [...monthExpenses].reverse().forEach(e => {
+      const isFav = favorites.includes(e.key);
+      html += '<div class="history-item"><div class="info"><b>' + escapeHtml(e.item) + '</b> ' + escapeHtml(e.category || '') + '<span class="time">' + escapeHtml(e.time) + '</span></div><div class="actions"><button class="fav-btn ' + (isFav ? 'active' : '') + '" onclick="toggleFav(\'' + e.key + '\')">⭐</button><button onclick="editItem(\'' + e.key + '\')">✏️</button><button onclick="deleteItem(\'' + e.key + '\')">🗑️</button></div></div>';
+    });
+  }
+  document.getElementById('historyFull').innerHTML = html;
+}
+function toggleFav(key) {
+  haptic();
+  const i = favorites.indexOf(key);
+  if (i > -1) favorites.splice(i, 1); else favorites.push(key);
+  localStorage.setItem('favorites', JSON.stringify(favorites));
+  renderHistory();
+}
+function deleteItem(key) {
+  if (!confirm('ลบรายการนี้เลยไหม?')) return;
+  haptic();
+  db.ref('expenses/' + key).remove();
+  setTimeout(renderHistory, 300);
+}
+function editItem(key) {
+  const item = allExpenses.find(e => e.key === key); if (!item) return;
+  const n = prompt('แก้ชื่อรายการ:', item.item); if (n === null) return;
+  const a = prompt('แก้จำนวนเงิน:', item.amount); if (a === null) return;
+  db.ref('expenses/' + key).update({ item: n, amount: parseFloat(a) });
+  setTimeout(renderHistory, 300);
+}
+
+/* ============ INFO ============ */
+function openInfo() {
+  haptic(); document.getElementById('infoPage').classList.add('show');
+  switchInfo('kwang');
+}
+function closeInfo() {
+  document.getElementById('infoPage').classList.remove('show');
+  if (infoListener) { infoListener.off(); infoListener = null; }
+}
+function switchInfo(who) {
+  infoCurrentTab = who;
+  document.getElementById('infoTabKwang').classList.toggle('active', who === 'kwang');
+  document.getElementById('infoTabBoom').classList.toggle('active', who === 'boom');
+  if (infoListener) { infoListener.off(); infoListener = null; }
+  const isMine = (who === MY_ROLE);
+  const path = isMine ? MY_INFO_PATH : PARTNER_INFO_PATH;
+  const displayName = who === 'kwang' ? partnerName : myName;
+  const canEdit = isMine;
+  infoListener = db.ref(path);
+  infoListener.on('value', snap => {
+    const data = snap.val();
+    const arr = [];
+    if (data) Object.keys(data).forEach(k => { arr.push({ key: k, label: data[k].label || '', value: data[k].value || '' }); });
+    renderInfo(arr, displayName, canEdit, who);
+  });
+}
+function renderInfo(arr, displayName, canEdit, who) {
+  const box = document.getElementById('infoFull');
+  let html = '<div class="info-header"><div class="info-title">' + (canEdit ? '📝 ของฉัน' : '💌 ของที่รัก') + ' — ' + escapeHtml(displayName) + '</div></div>';
+  if (arr.length === 0) {
+    html += '<div class="info-empty">' + (canEdit ? '💌 ยังไม่มีข้อมูลน้า<br>กดปุ่มด้านล่างเพื่อเพิ่มเลย' : '💌 ที่รักยังไม่ได้เพิ่มข้อมูลน้า') + '</div>';
+  } else {
+    arr.forEach(item => {
+      html += '<div class="info-item"><div class="info-content"><span class="info-label">' + escapeHtml(item.label) + '</span><span class="info-value">' + escapeHtml(item.value) + '</span></div>';
+      if (canEdit) html += '<div class="info-actions"><button onclick="editInfoItem(\'' + item.key + '\')">✏️</button><button onclick="deleteInfoItem(\'' + item.key + '\')">🗑️</button></div>';
+      html += '</div>';
+    });
+  }
+  if (canEdit) html += '<button class="info-add-btn" onclick="openInfoEdit()">➕ เพิ่มข้อมูลใหม่</button>';
+  box.innerHTML = html;
+}
+let currentEditInfoKey = null;
+function openInfoEdit() {
+  haptic(); currentEditInfoKey = null;
+  document.getElementById('infoLabelInput').value = '';
+  document.getElementById('infoValueInput').value = '';
+  document.getElementById('infoEditTitle').textContent = '➕ เพิ่มข้อมูลใหม่';
+  document.getElementById('infoEditModal').classList.add('show');
+}
+function editInfoItem(key) {
+  haptic(); currentEditInfoKey = key;
+  infoListener.once('value').then(snap => {
+    const data = snap.val();
+    if (data && data[key]) {
+      document.getElementById('infoLabelInput').value = data[key].label || '';
+      document.getElementById('infoValueInput').value = data[key].value || '';
+    }
+    document.getElementById('infoEditTitle').textContent = '✏️ แก้ไขข้อมูล';
+    document.getElementById('infoEditModal').classList.add('show');
+  });
+}
+function closeInfoEdit() { document.getElementById('infoEditModal').classList.remove('show'); currentEditInfoKey = null; }
+function saveInfoItem() {
+  const label = document.getElementById('infoLabelInput').value.trim();
+  const value = document.getElementById('infoValueInput').value.trim();
+  if (!label) { alert('ใส่หัวข้อก่อนน้า 🥺'); return; }
+  haptic();
+  const key = currentEditInfoKey || ('item_' + Date.now());
+  db.ref(MY_INFO_PATH + '/' + key).set({ label, value, updatedAt: Date.now() }).then(() => {
+    showToast('บันทึกแล้วน้า 💕'); closeInfoEdit();
+  });
+}
+function deleteInfoItem(key) {
+  if (!confirm('ลบข้อมูลนี้เลยไหม?')) return;
+  haptic();
+  db.ref(MY_INFO_PATH + '/' + key).remove();
+}
+
+/* ============ MENU / SETTINGS ============ */
+function openMenu() { haptic(); document.getElementById('menuModal').classList.add('show'); }
+function closeMenu() { document.getElementById('menuModal').classList.remove('show'); }
+function openSettings() {
+  haptic();
+  document.getElementById('budgetInput').value = dailyBudget;
+  document.getElementById('myNameInput').value = myName;
+  document.getElementById('partnerNameInput').value = partnerName;
+  document.getElementById('avatarInput').value = document.getElementById('avatar').textContent;
+  document.querySelectorAll('.theme-card').forEach(el => el.classList.toggle('active', el.dataset.theme === currentTheme));
+  document.querySelectorAll('.font-btn').forEach(el => el.classList.toggle('active', el.dataset.font === currentFont));
+  document.getElementById('settingsModal').classList.add('show');
+}
+function closeSettings() { document.getElementById('settingsModal').classList.remove('show'); }
+function saveSettings() {
+  const budget = parseFloat(document.getElementById('budgetInput').value) || 100;
+  const my = document.getElementById('myNameInput').value.trim() || 'บูม';
+  const partner = document.getElementById('partnerNameInput').value.trim() || 'กวาง';
+  const avatar = document.getElementById('avatarInput').value || '🐻';
+  myName = my; partnerName = partner;
+  localStorage.setItem('myName', my);
+  localStorage.setItem('partnerName', partner);
+  db.ref('settings').update({
+    dailyBudget: budget, avatar, kwangName: partner, boomName: my,
+    theme: currentTheme, font: currentFont
+  });
+  dailyBudget = budget;
+  document.getElementById('avatar').textContent = avatar;
+  applyNames(); closeSettings(); updateUI();
+  showToast('บันทึกแล้วน้า 💕');
+}
+function toggleMute() {
+  muted = !muted;
+  document.getElementById('muteBtn').textContent = muted ? '🔕' : '🔔';
+  localStorage.setItem('muted', muted);
+}
+
+/* ============ DELETE ALL ============ */
+function confirmDeleteAll() {
+  haptic(); closeSettings();
+  document.getElementById('deleteConfirm1').classList.add('show');
+}
+function closeDeleteConfirm1() { document.getElementById('deleteConfirm1').classList.remove('show'); }
+function confirmDeleteAllStep2() {
+  haptic();
+  document.getElementById('deleteConfirm1').classList.remove('show');
+  document.getElementById('deleteConfirmInput').value = '';
+  document.getElementById('deleteConfirm2').classList.add('show');
+}
+function closeDeleteConfirm2() { document.getElementById('deleteConfirm2').classList.remove('show'); }
+function executeDeleteAll() {
+  const input = document.getElementById('deleteConfirmInput').value.trim();
+  if (input !== 'ลบทั้งหมด') { showToast('พิมพ์ไม่ตรงน้า ลองใหม่ 🥺'); return; }
+  haptic(300);
+  showToast('⏳ กำลังลบข้อมูล...');
+  if (expensesRef) { expensesRef.off(); expensesRef = null; }
+  if (settingsRef) { settingsRef.off(); settingsRef = null; }
+  if (petRef) { petRef.off(); petRef = null; }
+  if (chatListener) { db.ref('messages').off('value', chatListener); chatListener = null; }
+  if (mapRefListener) { db.ref(mapRefListener.path).off('value', mapRefListener.cb); mapRefListener = null; }
+  if (infoListener) { infoListener.off(); infoListener = null; }
+  db.ref('messages').off();
+  db.ref('location_kwang').off();
+  db.ref('location_boom').off();
+  db.ref('info_kwang').off();
+  db.ref('info_boom').off();
+  db.ref('quickButtons_kwang').off();
+  const paths = ['expenses','messages','pet','settings','location','location_kwang','location_boom','info_kwang','info_boom','quickButtons_kwang'];
+  let done = 0, errors = 0;
+  paths.forEach(p => {
+    db.ref(p).remove().then(() => { done++; checkDone(); }).catch(e => { errors++; console.log(p, e); checkDone(); });
+  });
+  function checkDone() {
+    if (done + errors === paths.length) {
+      ['theme','font','favorites','lastSeenMsgTs','boom_lastSeenMsg','kwang_lastSeenMsg','myName','partnerName','boom_uid','kwang_uid','userId','muted'].forEach(k => {
+        try { localStorage.removeItem(k); } catch(e) {}
+      });
+      showToast('✅ ลบข้อมูลทั้งหมดแล้ว');
+      setTimeout(() => {
+        document.getElementById('deleteConfirm2').classList.remove('show');
+        location.reload(true);
+      }, 1200);
+    }
+  }
+}
+
+/* ============ INIT ============ */
+function init() {
+  applyTheme(); createBgHearts(); initChatEmojiPicker(); applyNames();
+  muted = localStorage.getItem('muted') === 'true';
+  if (muted) document.getElementById('muteBtn').textContent = '🔕';
+  loadFromFirebase();
+  startUnreadListener();
+  updateChatBadge();
+  document.querySelectorAll('.modal').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
+  });
+}
+init();
+</script>
+</body>
+  </html>
