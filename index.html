@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧸 กระเป๋าหนู</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: sans-serif; background: linear-gradient(180deg, #FFF0F5 0%, #FFE4EC 100%); min-height: 100vh; padding: 20px; color: #FF1493; }
+  .container { max-width: 400px; margin: 0 auto; }
+  .header { text-align: center; font-size: 26px; font-weight: bold; margin: 20px 0; text-shadow: 2px 2px 0 #fff; }
+  .card { background: white; border-radius: 25px; padding: 25px; box-shadow: 0 8px 20px rgba(255,105,180,0.2); margin-bottom: 20px; text-align: center; }
+  .remain { font-size: 52px; font-weight: bold; color: #FF1493; }
+  .label { font-size: 14px; color: #FF69B4; }
+  .progress-bar { background: #FFE4EC; border-radius: 20px; height: 20px; margin: 15px 0; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #FFB6C1, #FF69B4); border-radius: 20px; transition: width 0.5s; }
+  button { width: 100%; padding: 16px; border: none; border-radius: 20px; background: linear-gradient(135deg, #FFB6C1, #FF69B4); color: white; font-size: 16px; font-weight: bold; margin-bottom: 10px; cursor: pointer; box-shadow: 0 4px 10px rgba(255,105,180,0.3); font-family: inherit; }
+  button:active { transform: scale(0.97); }
+  .emojis { text-align: center; font-size: 32px; margin: 15px 0; letter-spacing: 8px; }
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,182,193,0.85); justify-content: center; align-items: center; z-index: 100; }
+  .modal.show { display: flex; }
+  .modal-content { background: white; border-radius: 25px; padding: 25px; width: 85%; max-width: 350px; text-align: center; }
+  .modal-content h3 { color: #FF1493; margin-bottom: 12px; }
+  .modal-content input { width: 100%; padding: 14px; border: 2px solid #FFB6C1; border-radius: 15px; font-size: 16px; margin: 8px 0; text-align: center; font-family: inherit; }
+  .history-item { background: #FFF0F5; padding: 12px; border-radius: 15px; margin-bottom: 8px; display: flex; justify-content: space-between; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">🧸 กระเป๋าหนูเอง 🐰</div>
+  <div class="card">
+    <div class="label">เหลือวันนี้</div>
+    <div class="remain" id="remain">100</div>
+    <div class="label">บาท</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress" style="width: 0%"></div></div>
+    <div class="label">วันนี้ใช้ไป <b id="todayTotal">0</b> บาท</div>
+  </div>
+  <div class="emojis">🐻 🐼 🐰 🎀</div>
+  <button onclick="openAdd()">🍰 เพิ่มรายจ่าย</button>
+  <button onclick="toggleHistory()">📜 ดูย้อนหลัง</button>
+  <div id="historyBox" style="display:none; margin-top:15px;"></div>
+</div>
+<div class="modal" id="addModal">
+  <div class="modal-content">
+    <h3>🍰 จ่ายอะไรไปน้า</h3>
+    <input type="text" id="itemInput" placeholder="เช่น ขนม, น้ำหวาน">
+    <input type="number" id="amountInput" placeholder="จำนวนเงิน (บาท)">
+    <button onclick="saveExpense()">💕 บันทึก</button>
+    <button onclick="closeAdd()" style="background:#FFB6C1;">ยกเลิก</button>
+  </div>
+</div>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = { databaseURL: "https://lovewallet-71a77-default-rtdb.asia-southeast1.firebasedatabase.app" };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+let expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+let todayTotal = parseFloat(localStorage.getItem('todayTotal') || '0');
+function updateUI() {
+  document.getElementById('remain').textContent = Math.max(0, 100 - todayTotal);
+  document.getElementById('todayTotal').textContent = todayTotal;
+  document.getElementById('progress').style.width = Math.min(100, (todayTotal / 100) * 100) + '%';
+}
+function openAdd() { document.getElementById('addModal').classList.add('show'); }
+function closeAdd() { document.getElementById('addModal').classList.remove('show'); }
+function saveExpense() {
+  const item = document.getElementById('itemInput').value.trim() || 'ไม่ระบุ';
+  const amount = parseFloat(document.getElementById('amountInput').value);
+  if (!amount || amount <= 0) { alert('ใส่จำนวนเงินก่อนน้า 🥺'); return; }
+  todayTotal += amount;
+  const now = new Date();
+  const record = { date: now.toLocaleDateString('th-TH'), time: now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}), item: item, amount: amount, todayTotal: todayTotal, remain: Math.max(0, 100 - todayTotal), timestamp: Date.now() };
+  expenses.push(record);
+  localStorage.setItem('expenses', JSON.stringify(expenses));
+  localStorage.setItem('todayTotal', todayTotal);
+  updateUI();
+  db.ref('expenses/' + record.timestamp).set(record).then(() => console.log('ok')).catch(e => console.log(e));
+  if (todayTotal > 100) { setTimeout(() => alert('เกินงบแล้วน้า 🥺💔\nใช้ไป ' + todayTotal + ' บาทแล้ว'), 300); }
+  document.getElementById('itemInput').value = '';
+  document.getElementById('amountInput').value = '';
+  closeAdd();
+}
+function toggleHistory() {
+  const box = document.getElementById('historyBox');
+  if (box.style.display === 'none') {
+    let html = '<div class="card" style="text-align:left;">';
+    if (expenses.length === 0) { html += '<div style="text-align:center;">ยังไม่มีรายการน้า 🐰</div>'; }
+    else { [...expenses].reverse().forEach(e => { html += '<div class="history-item"><span>' + e.item + '</span><span>' + e.amount + ' บาท 🎀</span></div>'; }); }
+    html += '</div>';
+    box.innerHTML = html;
+    box.style.display = 'block';
+  } else box.style.display = 'none';
+}
+updateUI();
+</script>
+</body>
+</html>
